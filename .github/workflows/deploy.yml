@@ -1,0 +1,64 @@
+name: Unified Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: './**/package-lock.json'
+
+      - name: Install Backend Dependencies
+        run: |
+          cd vetforum-backend
+          npm install
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd vetforum-frontend
+          npm install
+
+      - name: Build Frontend
+        run: |
+          cd vetforum-frontend
+          npm run build
+
+  deploy:
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to Hostinger VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_IP }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          script: |
+            cd /root/vetforumindiav2
+            git pull origin main
+            # Inject production secrets into a .env file for Docker
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
+            echo "RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}" >> .env
+            echo "RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET }}" >> .env
+            echo "ZOOM_ACCOUNT_ID=${{ secrets.ZOOM_ACCOUNT_ID }}" >> .env
+            echo "ZOOM_CLIENT_ID=${{ secrets.ZOOM_CLIENT_ID }}" >> .env
+            echo "ZOOM_CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }}" >> .env
+            echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
+            echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
+            # Start/Restart the containers
+            docker compose down
+            docker compose up -d --build
