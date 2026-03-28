@@ -60,6 +60,7 @@ jobs:
             echo "ZOOM_CLIENT_SECRET=${{ secrets.ZOOM_CLIENT_SECRET }}" >> .env
             echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
             echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
+            echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
             # Start/Restart the containers with a fresh build
             docker compose down
             docker compose up -d --build --force-recreate

@@ -4,23 +4,23 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: vetforumindia
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password_change_me}
     volumes:
       - db_data:/var/lib/mysql
 
   backend:
-    build: ./vetforum-backend 
+    build: ./vetforum-backend
+    image: vetforumindia-backend:latest
     restart: always
     ports:
       - "4000:4000"
     env_file:
       - .env
     environment:
-      # These variables can still be overridden individually if needed
       - DB_HOST=${DB_HOST:-db}
       - DB_NAME=${DB_NAME:-vetforumindia}
       - DB_USER=${DB_USER:-root}
-      - DB_PASSWORD=${DB_PASSWORD:-}
+      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD:-root_password_change_me}
       - PORT=${PORT:-4000}
       - NODE_ENV=${NODE_ENV:-production}
     depends_on:
@@ -29,6 +29,7 @@ services:
 
   frontend:
     build: ./vetforum-frontend
+    image: vetforumindia-frontend:latest
     restart: always
     ports:
       - "8081:80"
