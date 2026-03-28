@@ -28,6 +28,22 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
+    preview: {
+      port: 80,
+      host: '0.0.0.0',
+      proxy: {
+        '/api': {
+          target: 'http://backend:4000',
+          changeOrigin: true,
+          secure: false,
+        },
+        '/uploads': {
+          target: 'http://backend:4000',
+          changeOrigin: true,
+          secure: false,
+        }
+      }
+    },
     plugins: [react()],
     base: './',
     define: {

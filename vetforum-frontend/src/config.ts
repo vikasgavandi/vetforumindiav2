@@ -23,7 +23,8 @@ const getApiBaseUrl = () => {
     return `http://${apiHost}:4000/api/vetforumindia/v1`;
   }
   
-  return 'https://vetforumindia.com/api/vetforumindia/v1';
+  // For production or any other IP/Hostname, use relative paths to trigger the Vite/Nginx proxy
+  return '/api/vetforumindia/v1';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
