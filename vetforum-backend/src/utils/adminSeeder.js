@@ -1,116 +1,98 @@
-const { User, QuizCard } = require('../models');
-const bcrypt = require('bcryptjs');
-const logger = require('../middleware/logger');
+import { User, QuizCard } from '../models/index.js';
+import bcrypt from 'bcryptjs';
+import logger from '../middleware/logger.js';
 
-const seedAdminUser = async () => {
+export const seedAdminUser = async () => {
   try {
-    const adminEmail = 'admin@vetforumindia.com';
-    
-    const existingAdmin = await User.findOne({ where: { email: adminEmail } });
-    if (existingAdmin) {
-      logger.info('Admin user already exists');
-      return existingAdmin;
+    // Check if admin exists
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@vetforumindia.com';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
+
+    let admin = await User.findOne({ where: { email: adminEmail } });
+
+    if (!admin) {
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      admin = await User.create({
+        firstName: 'System',
+        lastName: 'Admin',
+        email: adminEmail,
+        password: hashedPassword,
+        isAdmin: true,
+        approvalStatus: 'approved'
+      });
+      logger.info('Admin user created successfully');
+    } else {
+      // Ensure existing admin has correct approval
+      await admin.update({
+        isAdmin: true,
+        approvalStatus: 'approved'
+      });
+      logger.info('Admin user already exists, updated permissions');
     }
 
-    const adminUser = await User.create({
-      firstName: 'Admin',
-      lastName: 'User',
-      email: adminEmail,
-      mobile: '9999999999',
-      state: 'Maharashtra',
-      password: 'admin123456',
-      isVeterinarian: false,
-      isAdmin: true
-    });
-
-    logger.info('Admin user created successfully', {
-      adminId: adminUser.id,
-      email: adminUser.email
-    });
-
-    return adminUser;
+    return admin;
   } catch (error) {
     logger.error('Error seeding admin user:', error);
     throw error;
   }
 };
 
-const seedSampleQuizCards = async () => {
+export const seedSampleQuizCards = async () => {
   try {
+    // Get an admin user to be the creator
     const admin = await User.findOne({ where: { isAdmin: true } });
-    if (!admin) {
-      logger.warn('No admin user found, skipping quiz card seeding');
-      return;
-    }
+    if (!admin) return;
 
-    const quizCardsData = [
+    const sampleCards = [
       {
-        title: 'Veterinary Nutrition Fundamentals',
-        description: 'Test your knowledge of basic animal nutrition principles and dietary requirements.',
+        title: 'Small Animal Medicine Basics',
+        description: 'Test your knowledge on common small animal medical conditions and treatments.',
+        category: 'Small Animal',
+        difficulty: 'Beginner',
+        duration: 20,
+        price: 0,
+        isActive: true,
+        createdBy: admin.id,
+        numberOfQuestions: 3,
+        status: 'ongoing'
+      },
+      {
+        title: 'Advanced Equine Surgery',
+        description: 'Challenging quiz for equine specialists and surgery residents.',
+        category: 'Equine',
+        difficulty: 'Advanced',
         duration: 30,
-        numberOfQuestions: 20,
+        price: 499,
+        isActive: true,
         createdBy: admin.id,
-        isActive: true
+        numberOfQuestions: 3,
+        status: 'ongoing'
       },
       {
-        title: 'Small Animal Medicine Quiz',
-        description: 'Comprehensive quiz covering small animal diseases, diagnosis, and treatment.',
-        duration: 45,
-        numberOfQuestions: 25,
+        title: 'Veterinary Pharmacology Review',
+        description: 'Comprehensive review of essential medications and dosages.',
+        category: 'General',
+        difficulty: 'Intermediate',
+        duration: 25,
+        price: 199,
+        isActive: true,
         createdBy: admin.id,
-        isActive: true
-      },
-      {
-        title: 'Large Animal Surgery Challenge',
-        description: 'Advanced quiz on surgical procedures and techniques for large animals.',
-        duration: 60,
-        numberOfQuestions: 30,
-        createdBy: admin.id,
-        isActive: true
-      },
-      {
-        title: 'Veterinary Pharmacology Speed Test',
-        description: 'Quick-fire questions on veterinary drugs, dosages, and contraindications.',
-        duration: 15,
-        numberOfQuestions: 15,
-        createdBy: admin.id,
-        isActive: true
+        numberOfQuestions: 3,
+        status: 'ongoing'
       }
     ];
 
-    for (const quizCardData of quizCardsData) {
-      const existingQuizCard = await QuizCard.findOne({ 
-        where: { 
-          title: quizCardData.title,
-          createdBy: admin.id 
-        } 
+    for (const card of sampleCards) {
+      const [record, created] = await QuizCard.findOrCreate({
+        where: { title: card.title },
+        defaults: card
       });
-      
-      if (!existingQuizCard) {
-        await QuizCard.create(quizCardData);
-        logger.info(`Quiz card "${quizCardData.title}" seeded successfully`);
+      if (created) {
+        logger.info(`Quiz card created: ${card.title}`);
       }
     }
   } catch (error) {
-    logger.error('Error seeding quiz cards:', error);
+    logger.error('Error seeding sample quiz cards:', error);
     throw error;
   }
-};
-
-const seedAdminData = async () => {
-  try {
-    logger.info('Starting admin data seeding...');
-    await seedAdminUser();
-    await seedSampleQuizCards();
-    logger.info('Admin data seeding completed successfully');
-  } catch (error) {
-    logger.error('Error in admin data seeding:', error);
-    throw error;
-  }
-};
-
-module.exports = {
-  seedAdminUser,
-  seedSampleQuizCards,
-  seedAdminData
 };

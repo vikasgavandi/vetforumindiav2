@@ -1,9 +1,10 @@
-const { Quiz, UserQuizProgress, User, QuizCard, QuizRegistration, sequelize } = require('../models');
-const razorpayService = require('../utils/razorpayService');
-const logger = require('../middleware/logger');
+import { Quiz, UserQuizProgress, User, QuizCard, QuizRegistration, sequelize } from '../models/index.js';
+import razorpayService from '../utils/razorpayService.js';
+import logger from '../middleware/logger.js';
+import { QueryTypes } from 'sequelize';
 
 // Get next question for user
-const getNextQuestion = async (req, res) => {
+export const getNextQuestion = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -104,7 +105,7 @@ const getNextQuestion = async (req, res) => {
 };
 
 // Submit answer for current question
-const submitAnswer = async (req, res) => {
+export const submitAnswer = async (req, res) => {
   try {
     const userId = req.user.id;
     const { answer } = req.body;
@@ -226,7 +227,7 @@ const submitAnswer = async (req, res) => {
 };
 
 // Get quiz progress/results
-const getQuizProgress = async (req, res) => {
+export const getQuizProgress = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -262,7 +263,7 @@ const getQuizProgress = async (req, res) => {
 };
 
 // Start new quiz (reset progress)
-const startNewQuiz = async (req, res) => {
+export const startNewQuiz = async (req, res) => {
   try {
     const userId = req.user.id;
     const { quizCardId } = req.body;
@@ -365,7 +366,7 @@ const startNewQuiz = async (req, res) => {
 };
 
 // Get all questions (admin function)
-const getAllQuestions = async (req, res) => {
+export const getAllQuestions = async (req, res) => {
   try {
     const { page = 1, limit = 10, category, difficulty } = req.query;
 
@@ -411,7 +412,7 @@ const getAllQuestions = async (req, res) => {
 };
 
 // Get all available quizzes with status filtering
-const getAvailableQuizzes = async (req, res) => {
+export const getAvailableQuizzes = async (req, res) => {
   try {
     const { status = 'ongoing', page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
@@ -495,7 +496,7 @@ const getAvailableQuizzes = async (req, res) => {
 };
 
 // Get quiz details by ID
-const getQuizDetails = async (req, res) => {
+export const getQuizDetails = async (req, res) => {
   try {
     const { quizCardId } = req.params;
 
@@ -538,7 +539,7 @@ const getQuizDetails = async (req, res) => {
 };
 
 // Get global leaderboard - Top 5 users across all quizzes by score and time
-const getGlobalLeaderboard = async (req, res) => {
+export const getGlobalLeaderboard = async (req, res) => {
   try {
     const { limit = 5 } = req.query;
 
@@ -574,7 +575,7 @@ const getGlobalLeaderboard = async (req, res) => {
       `,
       {
         replacements: [parseInt(limit)],
-        type: require('sequelize').QueryTypes.SELECT
+        type: QueryTypes.SELECT
       }
     );
 
@@ -629,7 +630,7 @@ const getGlobalLeaderboard = async (req, res) => {
 };
 
 // Get user's personal best scores across all quizzes
-const getUserBestScores = async (req, res) => {
+export const getUserBestScores = async (req, res) => {
   try {
     const userId = req.user.id;
     const { limit = 10 } = req.query;
@@ -661,7 +662,7 @@ const getUserBestScores = async (req, res) => {
       `,
       {
         replacements: [userId, parseInt(limit)],
-        type: require('sequelize').QueryTypes.SELECT
+        type: QueryTypes.SELECT
       }
     );
 
@@ -709,7 +710,7 @@ const getUserBestScores = async (req, res) => {
 };
 
 // Get user's quiz statistics - performance summary
-const getUserQuizStatistics = async (req, res) => {
+export const getUserQuizStatistics = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -730,7 +731,7 @@ const getUserQuizStatistics = async (req, res) => {
       `,
       {
         replacements: [userId],
-        type: require('sequelize').QueryTypes.SELECT
+        type: QueryTypes.SELECT
       }
     );
 
@@ -770,7 +771,7 @@ const getUserQuizStatistics = async (req, res) => {
 };
 
 // Join free quiz
-const joinQuiz = async (req, res) => {
+export const joinQuiz = async (req, res) => {
   try {
     const userId = req.user.id;
     const { contestId } = req.body;
@@ -808,7 +809,7 @@ const joinQuiz = async (req, res) => {
 };
 
 // Initiate Quiz Payment
-const initiateQuizPayment = async (req, res) => {
+export const initiateQuizPayment = async (req, res) => {
   try {
     const userId = req.user.id;
     const { contestId } = req.body;
@@ -859,7 +860,7 @@ const initiateQuizPayment = async (req, res) => {
 };
 
 // Verify Quiz Payment
-const verifyQuizPayment = async (req, res) => {
+export const verifyQuizPayment = async (req, res) => {
   try {
     const userId = req.user.id;
     const { contestId, paymentId, orderId, signature } = req.body;
@@ -897,7 +898,7 @@ const verifyQuizPayment = async (req, res) => {
 };
 
 // Get leaderboard for a specific quiz (Top 5 based on correct answers and time)
-const getQuizLeaderboard = async (req, res) => {
+export const getQuizLeaderboard = async (req, res) => {
   try {
     const { quizCardId } = req.params;
 
@@ -934,21 +935,4 @@ const getQuizLeaderboard = async (req, res) => {
     logger.error('Error fetching quiz leaderboard:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch leaderboard' });
   }
-};
-
-module.exports = {
-  getNextQuestion,
-  submitAnswer,
-  getQuizProgress,
-  startNewQuiz,
-  getAllQuestions,
-  getAvailableQuizzes,
-  getQuizDetails,
-  getGlobalLeaderboard,
-  getQuizLeaderboard,
-  getUserBestScores,
-  getUserQuizStatistics,
-  joinQuiz,
-  initiateQuizPayment,
-  verifyQuizPayment
 };

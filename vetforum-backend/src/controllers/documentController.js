@@ -1,10 +1,14 @@
-const { UserDocument, User } = require('../models');
-const path = require('path');
-const fs = require('fs');
-const logger = require('../middleware/logger');
+import { UserDocument, User } from '../models/index.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import logger from '../middleware/logger.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Get user's own documents
-const getUserDocuments = async (req, res) => {
+export const getUserDocuments = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -39,7 +43,7 @@ const getUserDocuments = async (req, res) => {
 };
 
 // Get all documents (Admin only)
-const getAllDocuments = async (req, res) => {
+export const getAllDocuments = async (req, res) => {
   try {
     // Check if user is admin
     if (!req.user.isAdmin) {
@@ -84,7 +88,7 @@ const getAllDocuments = async (req, res) => {
 };
 
 // Preview/Download document
-const previewDocument = async (req, res) => {
+export const previewDocument = async (req, res) => {
   try {
     const { documentId } = req.params;
     const userId = req.user.id;
@@ -150,7 +154,7 @@ const previewDocument = async (req, res) => {
 };
 
 // Update document verification status (Admin only)
-const updateDocumentVerification = async (req, res) => {
+export const updateDocumentVerification = async (req, res) => {
   try {
     // Check if user is admin
     if (!req.user.isAdmin) {
@@ -204,11 +208,4 @@ const updateDocumentVerification = async (req, res) => {
       error: 'Internal server error while updating document verification'
     });
   }
-};
-
-module.exports = {
-  getUserDocuments,
-  getAllDocuments,
-  previewDocument,
-  updateDocumentVerification
 };

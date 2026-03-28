@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const UserQuizProgress = sequelize.define('UserQuizProgress', {
   id: {
@@ -111,4 +111,4 @@ UserQuizProgress.prototype.getProgressSummary = function() {
   };
 };
 
-module.exports = UserQuizProgress;
+export default UserQuizProgress;

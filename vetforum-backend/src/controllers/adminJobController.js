@@ -1,8 +1,8 @@
-const JobVacancy = require('../models/JobVacancy');
-const { Op } = require('sequelize');
+import JobVacancy from '../models/JobVacancy.js';
+import { Op } from 'sequelize';
 
 // Create new job
-const createJob = async (req, res) => {
+export const createJob = async (req, res) => {
   try {
     const {
       title,
@@ -54,7 +54,7 @@ const createJob = async (req, res) => {
 };
 
 // Get all jobs with pagination and filters
-const getAllJobs = async (req, res) => {
+export const getAllJobs = async (req, res) => {
   try {
     const { page = 1, limit = 10, search, isActive } = req.query;
     const offset = (page - 1) * limit;
@@ -103,7 +103,7 @@ const getAllJobs = async (req, res) => {
 };
 
 // Get job by ID
-const getJobById = async (req, res) => {
+export const getJobById = async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -130,7 +130,7 @@ const getJobById = async (req, res) => {
 };
 
 // Update job
-const updateJob = async (req, res) => {
+export const updateJob = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -161,7 +161,7 @@ const updateJob = async (req, res) => {
 };
 
 // Delete job
-const deleteJob = async (req, res) => {
+export const deleteJob = async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -190,7 +190,7 @@ const deleteJob = async (req, res) => {
 };
 
 // Toggle job status (active/inactive)
-const toggleJobStatus = async (req, res) => {
+export const toggleJobStatus = async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -217,13 +217,4 @@ const toggleJobStatus = async (req, res) => {
       error: error.message
     });
   }
-};
-
-module.exports = {
-  createJob,
-  getAllJobs,
-  getJobById,
-  updateJob,
-  deleteJob,
-  toggleJobStatus
 };

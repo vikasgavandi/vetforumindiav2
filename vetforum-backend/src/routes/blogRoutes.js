@@ -1,5 +1,5 @@
-const express = require('express');
-const {
+import express from 'express';
+import {
   createBlog,
   getBlogs,
   getBlogById,
@@ -8,9 +8,9 @@ const {
   toggleLike,
   addComment,
   getBlogComments
-} = require('../controllers/blogController');
-const { authenticateToken } = require('../middleware/auth');
-const multer = require('multer');
+} from '../controllers/blogController.js';
+import { authenticateToken } from '../middleware/auth.js';
+import multer from 'multer';
 
 // Configure multer for memory storage (for processing with sharp)
 const upload = multer({
@@ -43,4 +43,4 @@ router.delete('/:id', authenticateToken, deleteBlog);
 router.post('/:id/like', authenticateToken, toggleLike);
 router.post('/:id/comment', authenticateToken, addComment);
 
-module.exports = router;
+export default router;

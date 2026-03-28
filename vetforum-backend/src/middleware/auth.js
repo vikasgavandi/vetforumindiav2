@@ -1,8 +1,8 @@
-const jwt = require('jsonwebtoken');
-const logger = require('./logger');
-const { User } = require('../models');
+import jwt from 'jsonwebtoken';
+import logger from './logger.js';
+import { User } from '../models/index.js';
 
-const generateToken = (user) => {
+export const generateToken = (user) => {
   return jwt.sign(
     {
       id: user.id,
@@ -16,7 +16,7 @@ const generateToken = (user) => {
   );
 };
 
-const authenticateToken = async (req, res, next) => {
+export const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
@@ -78,7 +78,7 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-const optionalAuth = async (req, res, next) => {
+export const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -100,10 +100,4 @@ const optionalAuth = async (req, res, next) => {
     });
     next();
   }
-};
-
-module.exports = {
-  generateToken,
-  authenticateToken,
-  optionalAuth
 };

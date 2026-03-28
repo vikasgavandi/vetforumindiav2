@@ -1,6 +1,6 @@
-const express = require('express');
-const { getExperts, getExpertById, createConsultation, getUserConsultations, getMyExpertProfile } = require('../controllers/expertController');
-const { authenticateToken } = require('../middleware/auth');
+import express from 'express';
+import { getExperts, getExpertById, createConsultation, getUserConsultations, getMyExpertProfile } from '../controllers/expertController.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -13,4 +13,4 @@ router.get('/:id', getExpertById);
 router.post('/consultation', authenticateToken, createConsultation);
 router.get('/consultation/my', authenticateToken, getUserConsultations);
 
-module.exports = router;
+export default router;

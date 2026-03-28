@@ -1,13 +1,13 @@
-const express = require('express');
-const {
+import express from 'express';
+import {
   createPaymentOrder,
   verifyPayment,
   handlePaymentFailure,
   refundPayment,
   getPaymentStatus
-} = require('../controllers/paymentController');
-const { authenticateToken } = require('../middleware/auth');
-const { requireAdmin } = require('../middleware/adminAuth');
+} from '../controllers/paymentController.js';
+import { authenticateToken } from '../middleware/auth.js';
+import { requireAdmin } from '../middleware/adminAuth.js';
 
 const router = express.Router();
 
@@ -20,4 +20,4 @@ router.get('/status/:appointmentId', authenticateToken, getPaymentStatus);
 // Admin payment routes
 router.post('/refund/:appointmentId', authenticateToken, requireAdmin, refundPayment);
 
-module.exports = router;
+export default router;

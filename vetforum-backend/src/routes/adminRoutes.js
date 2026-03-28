@@ -1,5 +1,5 @@
-const express = require('express');
-const {
+import express from 'express';
+import {
   createQuizCard,
   getQuizCards,
   getQuizCardById,
@@ -17,27 +17,26 @@ const {
   updateDoctor,
   deleteDoctor,
   promoteToExpert
-} = require('../controllers/adminController');
-const {
-  createBlog: adminCreateBlog,
-  getBlogs: adminGetBlogs,
-  getBlogById: adminGetBlogById,
-  updateBlog: adminUpdateBlog,
-  deleteBlog: adminDeleteBlog
-} = require('../controllers/blogController');
-const {
+} from '../controllers/adminController.js';
+import {
+  createBlog as adminCreateBlog,
+  getBlogs as adminGetBlogs,
+  getBlogById as adminGetBlogById,
+  updateBlog as adminUpdateBlog,
+  deleteBlog as adminDeleteBlog
+} from '../controllers/blogController.js';
+import {
   getDoctorAppointments,
   rescheduleAppointment,
   completeAppointment
-} = require('../controllers/appointmentController');
-const { authenticateToken } = require('../middleware/auth');
-const { requireAdmin } = require('../middleware/adminAuth');
-const adminJobRoutes = require('./adminJobRoutes');
+} from '../controllers/appointmentController.js';
+import { authenticateToken } from '../middleware/auth.js';
+import { requireAdmin } from '../middleware/adminAuth.js';
+import adminJobRoutes from './adminJobRoutes.js';
+import { DoctorAvailability } from '../models/index.js';
 
 const router = express.Router();
 
-// Apply authentication and admin check to all routes
-router.use(authenticateToken);
 // Apply authentication and admin check to all routes
 router.use(authenticateToken);
 router.use(requireAdmin);
@@ -81,8 +80,6 @@ router.delete('/doctors/:id', deleteDoctor);
 router.post('/doctors/promote', promoteToExpert);
 
 // Doctor Availability Management
-const { DoctorAvailability } = require('../models');
-
 // Set Doctor Availability
 router.post('/doctors/:expertId/availability', async (req, res) => {
   try {
@@ -139,4 +136,4 @@ router.put('/doctors/availability/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const Webinar = sequelize.define('Webinar', {
   id: {
@@ -43,4 +43,4 @@ const Webinar = sequelize.define('Webinar', {
   timestamps: true
 });
 
-module.exports = Webinar;
+export default Webinar;

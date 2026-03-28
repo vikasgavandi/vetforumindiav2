@@ -1,19 +1,11 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const PostInteraction = sequelize.define('PostInteraction', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'users',
-      key: 'id'
-    }
   },
   postId: {
     type: DataTypes.INTEGER,
@@ -23,17 +15,27 @@ const PostInteraction = sequelize.define('PostInteraction', {
       key: 'id'
     }
   },
-  type: {
-    type: DataTypes.ENUM('like', 'comment', 'share'),
-    allowNull: false
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
   },
-  content: {
-    type: DataTypes.TEXT,
-    allowNull: true // Only for comments
+  type: {
+    type: DataTypes.ENUM('like', 'save', 'report'),
+    allowNull: false
   }
 }, {
   tableName: 'post_interactions',
-  timestamps: true
+  timestamps: true,
+  indexes: [
+    {
+      unique: true,
+      fields: ['postId', 'userId', 'type']
+    }
+  ]
 });
 
-module.exports = PostInteraction;
+export default PostInteraction;

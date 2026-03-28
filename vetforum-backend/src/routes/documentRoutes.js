@@ -1,11 +1,11 @@
-const express = require('express');
-const {
+import express from 'express';
+import {
   getUserDocuments,
   getAllDocuments,
   previewDocument,
   updateDocumentVerification
-} = require('../controllers/documentController');
-const { authenticateToken } = require('../middleware/auth');
+} from '../controllers/documentController.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -24,4 +24,4 @@ router.get('/preview/:documentId', previewDocument);
 // Update document verification status (Admin only)
 router.put('/:documentId/verify', updateDocumentVerification);
 
-module.exports = router;
+export default router;

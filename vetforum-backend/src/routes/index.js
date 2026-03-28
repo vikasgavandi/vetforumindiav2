@@ -1,18 +1,18 @@
-const express = require('express');
+import express from 'express';
 
 // Import route modules
-const authRoutes = require('./authRoutes');
-const documentRoutes = require('./documentRoutes');
-const quizRoutes = require('./quizRoutes');
-const expertRoutes = require('./expertRoutes');
-const announcementRoutes = require('./announcementRoutes');
-const jobRoutes = require('./jobRoutes');
-const postRoutes = require('./postRoutes');
-const blogRoutes = require('./blogRoutes');
-const appointmentRoutes = require('./appointmentRoutes');
-const paymentRoutes = require('./paymentRoutes');
-const adminRoutes = require('./adminRoutes');
-const webinarRoutes = require('./webinarRoutes');
+import authRoutes from './authRoutes.js';
+import documentRoutes from './documentRoutes.js';
+import quizRoutes from './quizRoutes.js';
+import expertRoutes from './expertRoutes.js';
+import announcementRoutes from './announcementRoutes.js';
+import jobRoutes from './jobRoutes.js';
+import postRoutes from './postRoutes.js';
+import blogRoutes from './blogRoutes.js';
+import appointmentRoutes from './appointmentRoutes.js';
+import paymentRoutes from './paymentRoutes.js';
+import adminRoutes from './adminRoutes.js';
+import webinarRoutes from './webinarRoutes.js';
 
 // Create main router
 const router = express.Router();
@@ -89,4 +89,4 @@ router.get('/', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

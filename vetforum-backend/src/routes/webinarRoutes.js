@@ -1,8 +1,8 @@
-const express = require('express');
-const { authenticateToken } = require('../middleware/auth');
-const { requireAdmin } = require('../middleware/adminAuth');
+import express from 'express';
+import { authenticateToken } from '../middleware/auth.js';
+import { requireAdmin } from '../middleware/adminAuth.js';
 
-const {
+import {
   getActiveWebinar,
   getAllWebinars,
   createWebinar,
@@ -10,7 +10,7 @@ const {
   deleteWebinar,
   getWebinarRegistrations,
   registerForWebinar
-} = require('../controllers/webinarController');
+} from '../controllers/webinarController.js';
 
 const router = express.Router();
 
@@ -28,4 +28,4 @@ router.get('/:id/registrations', authenticateToken, requireAdmin, getWebinarRegi
 // ── Authenticated users ──────────────────────────────
 router.post('/:id/register', authenticateToken, registerForWebinar);
 
-module.exports = router;
+export default router;

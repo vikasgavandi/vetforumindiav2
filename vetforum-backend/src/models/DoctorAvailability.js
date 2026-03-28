@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const DoctorAvailability = sequelize.define('DoctorAvailability', {
   id: {
@@ -16,7 +16,7 @@ const DoctorAvailability = sequelize.define('DoctorAvailability', {
     }
   },
   dayOfWeek: {
-    type: DataTypes.ENUM('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+    type: DataTypes.ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
     allowNull: false
   },
   startTime: {
@@ -27,17 +27,13 @@ const DoctorAvailability = sequelize.define('DoctorAvailability', {
     type: DataTypes.TIME,
     allowNull: false
   },
-  consultationFee: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: false
-  },
-  isActive: {
+  isAvailable: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
   }
 }, {
-  tableName: 'doctor_availability',
+  tableName: 'doctor_availabilities',
   timestamps: true
 });
 
-module.exports = DoctorAvailability;
+export default DoctorAvailability;

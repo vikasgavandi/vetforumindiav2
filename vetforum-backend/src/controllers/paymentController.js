@@ -1,11 +1,11 @@
-const { Appointment } = require('../models');
-const razorpayService = require('../utils/razorpayService');
-const zoomService = require('../utils/zoomService');
-const calendarUtils = require('../utils/calendarUtils');
-const logger = require('../middleware/logger');
+import { Appointment } from '../models/index.js';
+import razorpayService from '../utils/razorpayService.js';
+import zoomService from '../utils/zoomService.js';
+import * as calendarUtils from '../utils/calendarUtils.js';
+import logger from '../middleware/logger.js';
 
 // Create Payment Order
-const createPaymentOrder = async (req, res) => {
+export const createPaymentOrder = async (req, res) => {
   try {
     const { appointmentId } = req.body;
     const userId = req.user.id;
@@ -104,7 +104,7 @@ const createPaymentOrder = async (req, res) => {
 };
 
 // Verify Payment and Create Meeting
-const verifyPayment = async (req, res) => {
+export const verifyPayment = async (req, res) => {
   try {
     const { 
       razorpay_order_id, 
@@ -233,7 +233,7 @@ const verifyPayment = async (req, res) => {
 };
 
 // Handle Payment Failure
-const handlePaymentFailure = async (req, res) => {
+export const handlePaymentFailure = async (req, res) => {
   try {
     const { appointmentId, error } = req.body;
     const userId = req.user.id;
@@ -269,7 +269,7 @@ const handlePaymentFailure = async (req, res) => {
 };
 
 // Refund Payment
-const refundPayment = async (req, res) => {
+export const refundPayment = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const { reason } = req.body;
@@ -304,7 +304,7 @@ const refundPayment = async (req, res) => {
       logger.warn('Refund processing failed, creating mock refund:', refundError);
       // Create mock refund in bypass mode
       refund = {
-        id: `rfnd_bypass_${Date.now()}`,
+        id: ` rfnd_bypass_${Date.now()}`,
         amount: Math.round(appointment.consultationFee * 100),
         status: 'processed'
       };
@@ -351,7 +351,7 @@ const refundPayment = async (req, res) => {
 };
 
 // Get Payment Status
-const getPaymentStatus = async (req, res) => {
+export const getPaymentStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const userId = req.user.id;
@@ -385,12 +385,4 @@ const getPaymentStatus = async (req, res) => {
       message: 'Failed to fetch payment status'
     });
   }
-};
-
-module.exports = {
-  createPaymentOrder,
-  verifyPayment,
-  handlePaymentFailure,
-  refundPayment,
-  getPaymentStatus
 };

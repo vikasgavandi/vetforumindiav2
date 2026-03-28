@@ -1,7 +1,7 @@
-const sharp = require('sharp');
-const path = require('path');
-const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+import sharp from 'sharp';
+import path from 'path';
+import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Ensures that the directory exists
@@ -19,7 +19,7 @@ const ensureDirectoryExists = (dirPath) => {
  * @param {string} subDirectory - e.g., 'blogs', 'doctors'
  * @returns {Promise<string|null>} - Filename of the saved image
  */
-const saveBase64Image = async (base64String, subDirectory = 'general') => {
+export const saveBase64Image = async (base64String, subDirectory = 'general') => {
   try {
     if (!base64String || !base64String.startsWith('data:image/')) {
       return null;
@@ -59,7 +59,7 @@ const saveBase64Image = async (base64String, subDirectory = 'general') => {
  * @param {string} filename 
  * @param {string} subDirectory 
  */
-const deleteImage = (filename, subDirectory) => {
+export const deleteImage = (filename, subDirectory) => {
   if (!filename) return;
   
   try {
@@ -81,7 +81,7 @@ const deleteImage = (filename, subDirectory) => {
  * @param {string} subDirectory - e.g., 'users', 'experts', 'blogs'
  * @returns {Promise<string|null>} - Filename of the saved image
  */
-const saveUploadedFile = async (file, subDirectory = 'general') => {
+export const saveUploadedFile = async (file, subDirectory = 'general') => {
   try {
     if (!file) {
       return null;
@@ -113,10 +113,3 @@ const saveUploadedFile = async (file, subDirectory = 'general') => {
     return null;
   }
 };
-
-module.exports = {
-  saveBase64Image,
-  deleteImage,
-  saveUploadedFile
-};
-

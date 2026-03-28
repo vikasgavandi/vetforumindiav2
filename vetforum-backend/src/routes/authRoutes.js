@@ -1,5 +1,5 @@
-const express = require('express');
-const { 
+import express from 'express';
+import { 
   register, 
   sendRegistrationOTP, 
   login, 
@@ -10,11 +10,15 @@ const {
   forgotPassword,
   verifyResetOTP,
   resetPassword
-} = require('../controllers/authController');
-const { authenticateToken } = require('../middleware/auth');
-// const { authRateLimit } = require('../middleware/rateLimiter');
-const multer = require('multer');
-const path = require('path');
+} from '../controllers/authController.js';
+import { authenticateToken } from '../middleware/auth.js';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
@@ -23,8 +27,8 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Temporary storage, files will be moved to user-specific folder after user creation
     const tempDir = path.join(__dirname, '../../uploads/temp');
-    if (!require('fs').existsSync(tempDir)) {
-      require('fs').mkdirSync(tempDir, { recursive: true });
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
     }
     cb(null, tempDir);
   },
@@ -80,9 +84,6 @@ const profilePhotoUpload = multer({
   }
 });
 
-// Apply rate limiting to auth routes
-// router.use(authRateLimit);
-
 // Send OTP for registration
 router.post('/send-otp', sendRegistrationOTP);
 
@@ -114,4 +115,4 @@ router.post('/profile/upload-photo', authenticateToken, profilePhotoUpload.singl
 // Delete profile photo route (protected)
 router.delete('/profile/delete-photo', authenticateToken, deleteProfilePhoto);
 
-module.exports = router;
+export default router;

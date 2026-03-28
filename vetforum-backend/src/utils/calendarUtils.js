@@ -1,46 +1,54 @@
 /**
- * Utility to generate calendar invitation links for consultations.
+ * Utility functions for date and calendar management.
+ * Specifically for scheduling doctor appointments and consultations.
  */
 
-const generateGoogleCalendarLink = (appointment) => {
-  const { appointmentDate, duration, doctor, reasonForConsultation, zoomJoinUrl } = appointment;
-  const start = new Date(appointmentDate);
-  const end = new Date(start.getTime() + (duration || 30) * 60000);
-
-  const fmtDate = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
-
-  const title = `Consultation with Dr. ${doctor?.name || 'Veterinarian'}`;
-  const details = `Reason: ${reasonForConsultation}\n\nJoin Zoom: ${zoomJoinUrl}`;
-  const location = zoomJoinUrl || 'Online Video Link';
-
-  return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmtDate(start)}/${fmtDate(end)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+/**
+ * Checks if a given time slot is within the specified availability range.
+ * @param {string} slotStart - Time string (HH:mm:ss)
+ * @param {string} slotEnd - Time string (HH:mm:ss)
+ * @param {string} availStart - Availability start time (HH:mm:ss)
+ * @param {string} availEnd - Availability end time (HH:mm:ss)
+ * @returns {boolean}
+ */
+export const isTimeInRange = (slotStart, slotEnd, availStart, availEnd) => {
+  // Simple string comparison works for HH:mm:ss format
+  return slotStart >= availStart && slotEnd <= availEnd;
 };
 
-const generateICSLink = (appointment) => {
-  const { appointmentDate, duration, doctor, reasonForConsultation, zoomJoinUrl } = appointment;
-  const start = new Date(appointmentDate);
-  const end = new Date(start.getTime() + (duration || 30) * 60000);
-
-  const fmtDate = (date) => date.toISOString().replace(/-|:|\.\d\d\d/g, "");
-
-  const icsContent = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "BEGIN:VEVENT",
-    `DTSTART:${fmtDate(start)}`,
-    `DTEND:${fmtDate(end)}`,
-    `SUMMARY:Consultation with Dr. ${doctor?.name || 'Veterinarian'}`,
-    `DESCRIPTION:Reason: ${reasonForConsultation}\\n\\nJoin Zoom: ${zoomJoinUrl}`,
-    `LOCATION:${zoomJoinUrl || 'Online Video Link'}`,
-    "END:VEVENT",
-    "END:VCALENDAR"
-  ].join("\n");
-
-  const base64Content = Buffer.from(icsContent).toString('base64');
-  return `data:text/calendar;base64,${base64Content}`;
+/**
+ * Formats a date object to YYYY-MM-DD string.
+ * @param {Date} date 
+ * @returns {string}
+ */
+export const formatDate = (date) => {
+  return date.toISOString().split('T')[0];
 };
 
-module.exports = {
-  generateGoogleCalendarLink,
-  generateICSLink
+/**
+ * Gets the day name (e.g., 'Monday') from a Date object.
+ * @param {Date} date 
+ * @returns {string}
+ */
+export const getDayName = (date) => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return days[date.getDay()];
+};
+
+/**
+ * Standardizes time format to HH:mm:ss.
+ * @param {string} time - Time string
+ * @returns {string}
+ */
+export const standardizeTime = (time) => {
+  // Handle cases like "9:00" or "09:00"
+  if (!time) return '00:00:00';
+  const parts = time.split(':');
+  if (parts.length < 2) return '00:00:00';
+  
+  const h = parts[0].padStart(2, '0');
+  const m = parts[1].padStart(2, '0');
+  const s = parts[2] ? parts[2].padStart(2, '0') : '00';
+  
+  return `${h}:${m}:${s}`;
 };

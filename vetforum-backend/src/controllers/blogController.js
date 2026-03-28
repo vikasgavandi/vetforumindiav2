@@ -1,10 +1,10 @@
-const { Blog, BlogInteraction, User } = require('../models');
-const { Op } = require('sequelize');
-const logger = require('../middleware/logger');
-const { saveBase64Image, deleteImage, saveUploadedFile } = require('../utils/imageHandler');
+import { Blog, BlogInteraction, User } from '../models/index.js';
+import { Op } from 'sequelize';
+import logger from '../middleware/logger.js';
+import { saveBase64Image, deleteImage, saveUploadedFile } from '../utils/imageHandler.js';
 
 // Create Blog
-const createBlog = async (req, res) => {
+export const createBlog = async (req, res) => {
   try {
     const { title, subtitle, content, excerpt, featuredImage, images, tags, status } = req.body;
     const authorId = req.user.id;
@@ -72,7 +72,7 @@ const createBlog = async (req, res) => {
 };
 
 // Get All Blogs (Published only for non-authors)
-const getBlogs = async (req, res) => {
+export const getBlogs = async (req, res) => {
   try {
     const { page = 1, limit = 10, status, tags, authorId, search } = req.query;
     const offset = (page - 1) * limit;
@@ -139,7 +139,7 @@ const getBlogs = async (req, res) => {
 };
 
 // Get Blog by ID or Slug
-const getBlogById = async (req, res) => {
+export const getBlogById = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
@@ -213,7 +213,7 @@ const getBlogById = async (req, res) => {
 };
 
 // Update Blog
-const updateBlog = async (req, res) => {
+export const updateBlog = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, subtitle, content, excerpt, featuredImage, images, tags, status } = req.body;
@@ -301,7 +301,7 @@ const updateBlog = async (req, res) => {
 };
 
 // Delete Blog
-const deleteBlog = async (req, res) => {
+export const deleteBlog = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -343,7 +343,7 @@ const deleteBlog = async (req, res) => {
 };
 
 // Like/Unlike Blog
-const toggleLike = async (req, res) => {
+export const toggleLike = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
@@ -393,7 +393,7 @@ const toggleLike = async (req, res) => {
 };
 
 // Add Comment
-const addComment = async (req, res) => {
+export const addComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
@@ -446,7 +446,7 @@ const addComment = async (req, res) => {
 };
 
 // Get Blog Comments
-const getBlogComments = async (req, res) => {
+export const getBlogComments = async (req, res) => {
   try {
     const { id } = req.params;
     const { page = 1, limit = 10 } = req.query;
@@ -481,15 +481,4 @@ const getBlogComments = async (req, res) => {
       message: 'Failed to fetch comments'
     });
   }
-};
-
-module.exports = {
-  createBlog,
-  getBlogs,
-  getBlogById,
-  updateBlog,
-  deleteBlog,
-  toggleLike,
-  addComment,
-  getBlogComments
 };

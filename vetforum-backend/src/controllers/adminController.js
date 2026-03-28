@@ -1,13 +1,13 @@
-const { QuizCard, QuizAttempt, User, UserDocument, Expert, DoctorAvailability } = require('../models');
-const { Op } = require('sequelize');
-const logger = require('../middleware/logger');
-const bcrypt = require('bcryptjs');
-const { transporter, getApprovalEmailTemplate } = require('./authController');
+import { QuizCard, QuizAttempt, User, UserDocument, Expert, DoctorAvailability, Quiz } from '../models/index.js';
+import { Op } from 'sequelize';
+import logger from '../middleware/logger.js';
+import bcrypt from 'bcryptjs';
+import { transporter, getApprovalEmailTemplate } from './authController.js';
 
 // --- Doctor (Expert) Management ---
 
 // Get all doctors
-const getAllDoctors = async (req, res) => {
+export const getAllDoctors = async (req, res) => {
   try {
     const doctors = await Expert.findAll({
       include: [{
@@ -31,7 +31,7 @@ const getAllDoctors = async (req, res) => {
 };
 
 // Create a new doctor (Expert profile)
-const createDoctor = async (req, res) => {
+export const createDoctor = async (req, res) => {
   try {
     const { 
       name, designation, qualification, specialization, 
@@ -114,7 +114,7 @@ const createDoctor = async (req, res) => {
 };
 
 // Update doctor profile
-const updateDoctor = async (req, res) => {
+export const updateDoctor = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -144,7 +144,7 @@ const updateDoctor = async (req, res) => {
 };
 
 // Delete doctor profile
-const deleteDoctor = async (req, res) => {
+export const deleteDoctor = async (req, res) => {
   try {
     const { id } = req.params;
     const expert = await Expert.findByPk(id);
@@ -175,7 +175,7 @@ const deleteDoctor = async (req, res) => {
 
 
 // Create Quiz Card (Admin Only)
-const createQuizCard = async (req, res) => {
+export const createQuizCard = async (req, res) => {
   try {
     console.log('--- DEBUG: createQuizCard Request ---');
     console.log('Body:', JSON.stringify(req.body, null, 2));
@@ -285,7 +285,6 @@ const createQuizCard = async (req, res) => {
            throw new Error('At least one question is required');
         }
 
-        const { Quiz: QuizModel } = require('../models');
         const questionsToCreate = questions.map((q, index) => {
           // Robust mapping with defaults and validation
           const questionText = q.text || q.question;
@@ -343,7 +342,7 @@ const createQuizCard = async (req, res) => {
           };
         });
 
-        await QuizModel.bulkCreate(questionsToCreate, { transaction: t });
+        await Quiz.bulkCreate(questionsToCreate, { transaction: t });
       }
 
       return quizCard;
@@ -357,7 +356,7 @@ const createQuizCard = async (req, res) => {
           attributes: { exclude: ['password'] }
         },
         {
-          model: require('../models').Quiz,
+          model: Quiz,
           as: 'questions'
         }
       ]
@@ -403,7 +402,7 @@ const createQuizCard = async (req, res) => {
 };
 
 // Get All Quiz Cards
-const getQuizCards = async (req, res) => {
+export const getQuizCards = async (req, res) => {
   try {
     // Parse query parameters with validation
     let { page = 1, limit = 10, isActive } = req.query;
@@ -463,7 +462,7 @@ const getQuizCards = async (req, res) => {
 };
 
 // Get Quiz Card by ID
-const getQuizCardById = async (req, res) => {
+export const getQuizCardById = async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -496,7 +495,7 @@ const getQuizCardById = async (req, res) => {
 };
 
 // Update Quiz Card
-const updateQuizCard = async (req, res) => {
+export const updateQuizCard = async (req, res) => {
   try {
     const { id } = req.params;
     const {
@@ -614,7 +613,7 @@ const updateQuizCard = async (req, res) => {
 };
 
 // Delete Quiz Card
-const deleteQuizCard = async (req, res) => {
+export const deleteQuizCard = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -647,7 +646,7 @@ const deleteQuizCard = async (req, res) => {
 };
 
 // Get Quiz Leaderboard (Top 3 fastest finishers)
-const getQuizLeaderboard = async (req, res) => {
+export const getQuizLeaderboard = async (req, res) => {
   try {
     const { quizCardId } = req.params;
     const { limit = 3 } = req.query;
@@ -683,17 +682,17 @@ const getQuizLeaderboard = async (req, res) => {
 };
 
 // Get Quiz Statistics
-const getQuizStatistics = async (req, res) => {
+export const getQuizStatistics = async (req, res) => {
   try {
     const { quizCardId } = req.params;
 
     const stats = await QuizAttempt.findAll({
       where: { quizCardId },
       attributes: [
-        [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'totalAttempts'],
-        [require('sequelize').fn('COUNT', require('sequelize').literal("CASE WHEN status = 'completed' THEN 1 END")), 'completedAttempts'],
-        [require('sequelize').fn('AVG', require('sequelize').col('score')), 'averageScore'],
-        [require('sequelize').fn('AVG', require('sequelize').col('timeTaken')), 'averageTime']
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'totalAttempts'],
+        [Sequelize.fn('COUNT', Sequelize.literal("CASE WHEN status = 'completed' THEN 1 END")), 'completedAttempts'],
+        [Sequelize.fn('AVG', Sequelize.col('score')), 'averageScore'],
+        [Sequelize.fn('AVG', Sequelize.col('timeTaken')), 'averageTime']
       ],
       raw: true
     });
@@ -713,7 +712,7 @@ const getQuizStatistics = async (req, res) => {
 
 
 // Get Pending Users (Admin Only)
-const getPendingUsers = async (req, res) => {
+export const getPendingUsers = async (req, res) => {
   try {
     const users = await User.findAll({
       where: { approvalStatus: 'pending' },
@@ -739,7 +738,7 @@ const getPendingUsers = async (req, res) => {
 };
 
 // Approve User
-const approveUser = async (req, res) => {
+export const approveUser = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findByPk(id);
@@ -798,7 +797,7 @@ const approveUser = async (req, res) => {
 };
 
 // Reject User
-const rejectUser = async (req, res) => {
+export const rejectUser = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findByPk(id);
@@ -834,7 +833,7 @@ const rejectUser = async (req, res) => {
 // Promote a Vet to Expert (Admin Only)
 // Admin provides the vet's email to explicitly grant them Expert/consultation access.
 // This is the ONLY way D, E, F can become Experts — A must call this route.
-const promoteToExpert = async (req, res) => {
+export const promoteToExpert = async (req, res) => {
   try {
     const { email, designation, specialization, yearsOfExperience, consultationFee, bio, qualification } = req.body;
 
@@ -900,7 +899,7 @@ const promoteToExpert = async (req, res) => {
 };
 
 // Get User Statistics
-const getUserStats = async (req, res) => {
+export const getUserStats = async (req, res) => {
   try {
     logger.info('Fetching user statistics... (req.user: ' + (req.user ? req.user.email : 'None') + ')');
     const totalUsers = await User.count();
@@ -977,7 +976,7 @@ const getUserStats = async (req, res) => {
 };
 
 // Get All Users
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
   try {
     const { active } = req.query;
     let whereClause = {};
@@ -1006,24 +1005,4 @@ const getAllUsers = async (req, res) => {
       message: 'Failed to fetch users'
     });
   }
-};
-
-module.exports = {
-  getUserStats,
-  getAllUsers,
-  createQuizCard,
-  getQuizCards,
-  getQuizCardById,
-  updateQuizCard,
-  deleteQuizCard,
-  getQuizLeaderboard,
-  getQuizStatistics,
-  getPendingUsers,
-  approveUser,
-  rejectUser,
-  getAllDoctors,
-  createDoctor,
-  updateDoctor,
-  deleteDoctor,
-  promoteToExpert
 };

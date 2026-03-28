@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const Quiz = sequelize.define('Quiz', {
   id: {
@@ -121,4 +121,4 @@ Quiz.prototype.toAnswerJSON = function() {
   };
 };
 
-module.exports = Quiz;
+export default Quiz;

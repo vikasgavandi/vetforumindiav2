@@ -1,11 +1,11 @@
-const { Appointment, Expert, User, DoctorAvailability } = require('../models');
-const { Op } = require('sequelize');
-const zoomService = require('../utils/zoomService');
-const calendarUtils = require('../utils/calendarUtils');
-const logger = require('../middleware/logger');
+import { Appointment, Expert, User, DoctorAvailability } from '../models/index.js';
+import { Op } from 'sequelize';
+import zoomService from '../utils/zoomService.js';
+import * as calendarUtils from '../utils/calendarUtils.js';
+import logger from '../middleware/logger.js';
 
 // Get Doctor Availability
-const getDoctorAvailability = async (req, res) => {
+export const getDoctorAvailability = async (req, res) => {
   try {
     const { expertId } = req.params;
     const { date } = req.query;
@@ -99,7 +99,7 @@ const getDoctorAvailability = async (req, res) => {
 };
 
 // Book Appointment
-const bookAppointment = async (req, res) => {
+export const bookAppointment = async (req, res) => {
   try {
     const { expertId, appointmentDate, duration, reasonForConsultation } = req.body;
     const userId = req.user.id;
@@ -196,7 +196,7 @@ const bookAppointment = async (req, res) => {
 // Note: Payment processing moved to paymentController.js with Razorpay integration
 
 // Process Payment (wrapper for payment routes)
-const processPayment = async (req, res) => {
+export const processPayment = async (req, res) => {
   try {
     const { appointmentId, action } = req.body;
     const userId = req.user.id;
@@ -255,7 +255,7 @@ const processPayment = async (req, res) => {
 };
 
 // Get User Appointments
-const getUserAppointments = async (req, res) => {
+export const getUserAppointments = async (req, res) => {
   try {
     const userId = req.user.id;
     const { status, page = 1, limit = 10 } = req.query;
@@ -305,7 +305,7 @@ const getUserAppointments = async (req, res) => {
 };
 
 // Get Doctor Appointments
-const getDoctorAppointments = async (req, res) => {
+export const getDoctorAppointments = async (req, res) => {
   try {
     const { expertId } = req.params;
     const { status, date, page = 1, limit = 10 } = req.query;
@@ -352,7 +352,7 @@ const getDoctorAppointments = async (req, res) => {
 };
 
 // Reschedule Appointment (Doctor only)
-const rescheduleAppointment = async (req, res) => {
+export const rescheduleAppointment = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const { newDate, reason } = req.body;
@@ -411,7 +411,7 @@ const rescheduleAppointment = async (req, res) => {
 };
 
 // Complete Appointment with Notes
-const completeAppointment = async (req, res) => {
+export const completeAppointment = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const { doctorNotes, prescriptions, followUpRequired, followUpDate } = req.body;
@@ -452,7 +452,7 @@ const completeAppointment = async (req, res) => {
 };
 
 // Get My (Doctor) Appointments
-const getMyDoctorAppointments = async (req, res) => {
+export const getMyDoctorAppointments = async (req, res) => {
   try {
     const userId = req.user.id;
     
@@ -516,7 +516,7 @@ const getMyDoctorAppointments = async (req, res) => {
 };
 
 // Add Doctor Availability
-const addDoctorAvailability = async (req, res) => {
+export const addDoctorAvailability = async (req, res) => {
   try {
     const userId = req.user.id;
     const { expertId } = req.params;
@@ -554,7 +554,7 @@ const addDoctorAvailability = async (req, res) => {
 };
 
 // Delete Doctor Availability
-const deleteDoctorAvailability = async (req, res) => {
+export const deleteDoctorAvailability = async (req, res) => {
   try {
     const userId = req.user.id;
     const { id } = req.params;
@@ -597,7 +597,7 @@ const deleteDoctorAvailability = async (req, res) => {
 };
 
 // Get Appointment by ID
-const getAppointmentById = async (req, res) => {
+export const getAppointmentById = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const userId = req.user.id;
@@ -630,18 +630,4 @@ const getAppointmentById = async (req, res) => {
       message: 'Failed to fetch appointment'
     });
   }
-};
-
-module.exports = {
-  getDoctorAvailability,
-  bookAppointment,
-  processPayment,
-  getUserAppointments,
-  getDoctorAppointments,
-  getMyDoctorAppointments,
-  rescheduleAppointment,
-  completeAppointment,
-  addDoctorAvailability,
-  deleteDoctorAvailability,
-  getAppointmentById
 };

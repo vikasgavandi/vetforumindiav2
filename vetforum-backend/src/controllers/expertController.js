@@ -1,8 +1,8 @@
-const { Expert, Consultation, User } = require('../models');
-const logger = require('../middleware/logger');
+import { Expert, Consultation, User } from '../models/index.js';
+import logger from '../middleware/logger.js';
 
 // Get all experts
-const getExperts = async (req, res) => {
+export const getExperts = async (req, res) => {
   try {
     const experts = await Expert.findAll({
       where: { isActive: true },
@@ -23,7 +23,7 @@ const getExperts = async (req, res) => {
 };
 
 // Get expert by ID
-const getExpertById = async (req, res) => {
+export const getExpertById = async (req, res) => {
   try {
     const { id } = req.params;
     const expert = await Expert.findByPk(id);
@@ -49,7 +49,7 @@ const getExpertById = async (req, res) => {
 };
 
 // Create consultation request
-const createConsultation = async (req, res) => {
+export const createConsultation = async (req, res) => {
   try {
     const { expertId, reasonForConsultation } = req.body;
     const userId = req.user.id;
@@ -91,7 +91,7 @@ const createConsultation = async (req, res) => {
 };
 
 // Get user consultations
-const getUserConsultations = async (req, res) => {
+export const getUserConsultations = async (req, res) => {
   try {
     const userId = req.user.id;
     const consultations = await Consultation.findAll({
@@ -114,7 +114,7 @@ const getUserConsultations = async (req, res) => {
 };
 
 // Get current user's expert profile
-const getMyExpertProfile = async (req, res) => {
+export const getMyExpertProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const expert = await Expert.findOne({
@@ -139,12 +139,4 @@ const getMyExpertProfile = async (req, res) => {
       message: 'Failed to fetch expert profile'
     });
   }
-};
-
-module.exports = {
-  getExperts,
-  getExpertById,
-  createConsultation,
-  getUserConsultations,
-  getMyExpertProfile
 };

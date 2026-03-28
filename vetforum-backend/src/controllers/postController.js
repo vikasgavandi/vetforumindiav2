@@ -1,9 +1,9 @@
-const { Post, PostInteraction, User } = require('../models');
-const { Op } = require('sequelize');
-const logger = require('../middleware/logger');
+import { Post, PostInteraction, User } from '../models/index.js';
+import { Op } from 'sequelize';
+import logger from '../middleware/logger.js';
 
 // Create a new post
-const createPost = async (req, res) => {
+export const createPost = async (req, res) => {
   try {
     const { content, photos = [] } = req.body;
     const userId = req.user.id;
@@ -37,7 +37,7 @@ const createPost = async (req, res) => {
 };
 
 // Get all posts (feed)
-const getPosts = async (req, res) => {
+export const getPosts = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
@@ -74,7 +74,7 @@ const getPosts = async (req, res) => {
 };
 
 // Get user's posts
-const getUserPosts = async (req, res) => {
+export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
     const { page = 1, limit = 10 } = req.query;
@@ -115,7 +115,7 @@ const getUserPosts = async (req, res) => {
 };
 
 // Like/Unlike a post
-const toggleLike = async (req, res) => {
+export const toggleLike = async (req, res) => {
   try {
     const { postId } = req.params;
     const userId = req.user.id;
@@ -167,7 +167,7 @@ const toggleLike = async (req, res) => {
 };
 
 // Add comment to post
-const addComment = async (req, res) => {
+export const addComment = async (req, res) => {
   try {
     const { postId } = req.params;
     const { content } = req.body;
@@ -223,7 +223,7 @@ const addComment = async (req, res) => {
 };
 
 // Get post comments
-const getPostComments = async (req, res) => {
+export const getPostComments = async (req, res) => {
   try {
     const { postId } = req.params;
     const { page = 1, limit = 10 } = req.query;
@@ -261,7 +261,7 @@ const getPostComments = async (req, res) => {
 };
 
 // Share post
-const sharePost = async (req, res) => {
+export const sharePost = async (req, res) => {
   try {
     const { postId } = req.params;
     const userId = req.user.id;
@@ -298,14 +298,4 @@ const sharePost = async (req, res) => {
       message: 'Failed to share post'
     });
   }
-};
-
-module.exports = {
-  createPost,
-  getPosts,
-  getUserPosts,
-  toggleLike,
-  addComment,
-  getPostComments,
-  sharePost
 };

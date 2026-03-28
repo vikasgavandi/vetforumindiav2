@@ -1,5 +1,5 @@
-const express = require('express');
-const { getJobVacancies, getJobVacancyById } = require('../controllers/jobController');
+import express from 'express';
+import { getJobVacancies, getJobVacancyById } from '../controllers/jobController.js';
 
 const router = express.Router();
 
@@ -7,4 +7,4 @@ const router = express.Router();
 router.get('/', getJobVacancies);
 router.get('/:id', getJobVacancyById);
 
-module.exports = router;
+export default router;

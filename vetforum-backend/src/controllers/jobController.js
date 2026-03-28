@@ -1,8 +1,9 @@
-const { JobVacancy } = require('../models');
-const logger = require('../middleware/logger');
+import { JobVacancy } from '../models/index.js';
+import logger from '../middleware/logger.js';
+import { Op } from 'sequelize';
 
 // Get all job vacancies
-const getJobVacancies = async (req, res) => {
+export const getJobVacancies = async (req, res) => {
   try {
     const { page = 1, limit = 10, location, organization } = req.query;
     const offset = (page - 1) * limit;
@@ -11,13 +12,13 @@ const getJobVacancies = async (req, res) => {
     
     // Add filters
     if (location) {
-      whereClause.location = { [require('sequelize').Op.iLike]: `%${location}%` };
+      whereClause.location = { [Op.iLike]: `%${location}%` };
     }
     if (organization) {
-      whereClause.organization = { [require('sequelize').Op.iLike]: `%${organization}%` };
+      whereClause.organization = { [Op.iLike]: `%${organization}%` };
     }
 
-    const jobs = await JobVacancy.findAndCountAll({
+    const { count, rows } = await JobVacancy.findAndCountAll({
       where: whereClause,
       order: [['createdAt', 'DESC']],
       limit: parseInt(limit),
@@ -26,11 +27,11 @@ const getJobVacancies = async (req, res) => {
 
     res.json({
       success: true,
-      data: jobs.rows,
+      data: rows,
       pagination: {
         currentPage: parseInt(page),
-        totalPages: Math.ceil(jobs.count / limit),
-        totalItems: jobs.count,
+        totalPages: Math.ceil(count / limit),
+        totalItems: count,
         itemsPerPage: parseInt(limit)
       }
     });
@@ -44,7 +45,7 @@ const getJobVacancies = async (req, res) => {
 };
 
 // Get job vacancy by ID
-const getJobVacancyById = async (req, res) => {
+export const getJobVacancyById = async (req, res) => {
   try {
     const { id } = req.params;
     const job = await JobVacancy.findByPk(id);
@@ -67,9 +68,4 @@ const getJobVacancyById = async (req, res) => {
       message: 'Failed to fetch job vacancy'
     });
   }
-};
-
-module.exports = {
-  getJobVacancies,
-  getJobVacancyById
 };

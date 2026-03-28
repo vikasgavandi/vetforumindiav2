@@ -1,8 +1,8 @@
-const { Announcement } = require('../models');
-const logger = require('../middleware/logger');
+import { Announcement } from '../models/index.js';
+import logger from '../middleware/logger.js';
 
 // Get all announcements
-const getAnnouncements = async (req, res) => {
+export const getAnnouncements = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
@@ -34,7 +34,7 @@ const getAnnouncements = async (req, res) => {
 };
 
 // Get announcement by ID
-const getAnnouncementById = async (req, res) => {
+export const getAnnouncementById = async (req, res) => {
   try {
     const { id } = req.params;
     const announcement = await Announcement.findByPk(id);
@@ -60,7 +60,7 @@ const getAnnouncementById = async (req, res) => {
 };
 
 // Create a new announcement (Admin only)
-const createAnnouncement = async (req, res) => {
+export const createAnnouncement = async (req, res) => {
   try {
     const { title, content, eventDate, link, venue, organizer, photo } = req.body;
     const authorId = req.user.id; // From auth middleware
@@ -106,7 +106,7 @@ const createAnnouncement = async (req, res) => {
 };
 
 // Update an announcement (Admin only)
-const updateAnnouncement = async (req, res) => {
+export const updateAnnouncement = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, eventDate, link, venue, organizer, photo, isActive, priority } = req.body;
@@ -152,7 +152,7 @@ const updateAnnouncement = async (req, res) => {
 };
 
 // Delete an announcement (Admin only)
-const deleteAnnouncement = async (req, res) => {
+export const deleteAnnouncement = async (req, res) => {
   try {
     const { id } = req.params;
     const announcement = await Announcement.findByPk(id);
@@ -182,12 +182,4 @@ const deleteAnnouncement = async (req, res) => {
       message: 'Failed to delete announcement'
     });
   }
-};
-
-module.exports = {
-  getAnnouncements,
-  getAnnouncementById,
-  createAnnouncement,
-  updateAnnouncement,
-  deleteAnnouncement
 };

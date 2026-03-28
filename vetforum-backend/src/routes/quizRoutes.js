@@ -1,5 +1,5 @@
-const express = require('express');
-const {
+import express from 'express';
+import {
   getNextQuestion,
   submitAnswer,
   getQuizProgress,
@@ -14,8 +14,8 @@ const {
   initiateQuizPayment,
   verifyQuizPayment,
   getQuizLeaderboard
-} = require('../controllers/quizController');
-const { authenticateToken, optionalAuth } = require('../middleware/auth');
+} from '../controllers/quizController.js';
+import { authenticateToken, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -39,4 +39,4 @@ router.post('/payment/verify', authenticateToken, verifyQuizPayment);
 // Parameterized route MUST come last (catches everything not matched above)
 router.get('/:quizCardId', optionalAuth, getQuizDetails);
 
-module.exports = router;
+export default router;

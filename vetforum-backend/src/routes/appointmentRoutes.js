@@ -1,5 +1,5 @@
-const express = require('express');
-const {
+import express from 'express';
+import {
   getDoctorAvailability,
   bookAppointment,
   processPayment,
@@ -11,8 +11,8 @@ const {
   addDoctorAvailability,
   deleteDoctorAvailability,
   getAppointmentById
-} = require('../controllers/appointmentController');
-const { authenticateToken } = require('../middleware/auth');
+} from '../controllers/appointmentController.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -35,4 +35,4 @@ router.get('/doctors/:expertId', authenticateToken, getDoctorAppointments);
 router.put('/:appointmentId/reschedule', authenticateToken, rescheduleAppointment);
 router.put('/:appointmentId/complete', authenticateToken, completeAppointment);
 
-module.exports = router;
+export default router;

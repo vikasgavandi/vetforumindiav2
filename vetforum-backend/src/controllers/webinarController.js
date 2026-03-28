@@ -1,8 +1,8 @@
-const { Webinar, WebinarRegistration } = require('../models');
-const logger = require('../middleware/logger');
+import { Webinar, WebinarRegistration } from '../models/index.js';
+import logger from '../middleware/logger.js';
 
 // ─── Public: Get the single live webinar ────────────────────────────────────
-const getActiveWebinar = async (req, res) => {
+export const getActiveWebinar = async (req, res) => {
   try {
     const webinar = await Webinar.findOne({
       where: { isLive: true },
@@ -20,7 +20,7 @@ const getActiveWebinar = async (req, res) => {
 };
 
 // ─── Admin: Get all webinars ─────────────────────────────────────────────────
-const getAllWebinars = async (req, res) => {
+export const getAllWebinars = async (req, res) => {
   try {
     const webinars = await Webinar.findAll({
       order: [['createdAt', 'DESC']]
@@ -33,7 +33,7 @@ const getAllWebinars = async (req, res) => {
 };
 
 // ─── Admin: Create a webinar ─────────────────────────────────────────────────
-const createWebinar = async (req, res) => {
+export const createWebinar = async (req, res) => {
   try {
     const { topic, speakerName, dateTime, registrationFees, paymentLink } = req.body;
 
@@ -60,7 +60,7 @@ const createWebinar = async (req, res) => {
 };
 
 // ─── Admin: Update / toggle webinar ─────────────────────────────────────────
-const updateWebinar = async (req, res) => {
+export const updateWebinar = async (req, res) => {
   try {
     const { id } = req.params;
     const { topic, speakerName, dateTime, registrationFees, paymentLink, isLive } = req.body;
@@ -95,7 +95,7 @@ const updateWebinar = async (req, res) => {
 };
 
 // ─── Admin: Delete a webinar ─────────────────────────────────────────────────
-const deleteWebinar = async (req, res) => {
+export const deleteWebinar = async (req, res) => {
   try {
     const { id } = req.params;
     const webinar = await Webinar.findByPk(id);
@@ -116,7 +116,7 @@ const deleteWebinar = async (req, res) => {
 };
 
 // ─── Admin: Get all registrations for a webinar ──────────────────────────────
-const getWebinarRegistrations = async (req, res) => {
+export const getWebinarRegistrations = async (req, res) => {
   try {
     const { id } = req.params;
     const registrations = await WebinarRegistration.findAll({
@@ -131,7 +131,7 @@ const getWebinarRegistrations = async (req, res) => {
 };
 
 // ─── User: Register for the live webinar ─────────────────────────────────────
-const registerForWebinar = async (req, res) => {
+export const registerForWebinar = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, phone, jobTitle, organization, consentGiven } = req.body;
@@ -177,14 +177,4 @@ const registerForWebinar = async (req, res) => {
     logger.error('Error registering for webinar:', error);
     res.status(500).json({ success: false, message: 'Failed to register for webinar' });
   }
-};
-
-module.exports = {
-  getActiveWebinar,
-  getAllWebinars,
-  createWebinar,
-  updateWebinar,
-  deleteWebinar,
-  getWebinarRegistrations,
-  registerForWebinar
 };

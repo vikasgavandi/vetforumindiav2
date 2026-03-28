@@ -2,6 +2,7 @@
   "name": "vetforumindia-backend",
   "version": "1.0.0",
   "description": "Backend for Vet Forum India application",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -37,7 +38,7 @@
     "razorpay": "^2.9.2",
     "sequelize": "^6.35.0",
     "sharp": "^0.34.5",
-    "uuid": "^8.3.2",
+    "uuid": "^11.0.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {

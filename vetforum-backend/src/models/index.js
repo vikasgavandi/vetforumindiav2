@@ -1,27 +1,29 @@
-const sequelize = require('../config/database');
-const User = require('./User');
-const UserDocument = require('./UserDocument');
-const Quiz = require('./Quiz');
-const UserQuizProgress = require('./UserQuizProgress');
-const QuizCard = require('./QuizCard');
-const QuizAttempt = require('./QuizAttempt');
-const Expert = require('./Expert');
-const Consultation = require('./Consultation');
-const Announcement = require('./Announcement');
-const JobVacancy = require('./JobVacancy');
-const Post = require('./Post');
-const PostInteraction = require('./PostInteraction');
-const Blog = require('./Blog');
-const BlogInteraction = require('./BlogInteraction');
-const Appointment = require('./Appointment');
-const DoctorAvailability = require('./DoctorAvailability');
-const QuizRegistration = require('./QuizRegistration');
-const Webinar = require('./Webinar');
-const WebinarRegistration = require('./WebinarRegistration');
+import { Sequelize } from 'sequelize';
+import sequelize from '../config/database.js';
+
+import User from './User.js';
+import UserDocument from './UserDocument.js';
+import Quiz from './Quiz.js';
+import UserQuizProgress from './UserQuizProgress.js';
+import QuizCard from './QuizCard.js';
+import QuizAttempt from './QuizAttempt.js';
+import Expert from './Expert.js';
+import Consultation from './Consultation.js';
+import Announcement from './Announcement.js';
+import JobVacancy from './JobVacancy.js';
+import Post from './Post.js';
+import PostInteraction from './PostInteraction.js';
+import Blog from './Blog.js';
+import BlogInteraction from './BlogInteraction.js';
+import Appointment from './Appointment.js';
+import DoctorAvailability from './DoctorAvailability.js';
+import QuizRegistration from './QuizRegistration.js';
+import Webinar from './Webinar.js';
+import WebinarRegistration from './WebinarRegistration.js';
 
 const db = {
   sequelize,
-  Sequelize: require('sequelize'),
+  Sequelize,
   User,
   UserDocument,
   Quiz,
@@ -277,4 +279,26 @@ WebinarRegistration.belongsTo(Webinar, {
   as: 'webinar'
 });
 
-module.exports = db;
+export default db;
+export {
+  sequelize,
+  User,
+  UserDocument,
+  Quiz,
+  UserQuizProgress,
+  QuizCard,
+  QuizAttempt,
+  Expert,
+  Consultation,
+  Announcement,
+  JobVacancy,
+  Post,
+  PostInteraction,
+  Blog,
+  BlogInteraction,
+  Appointment,
+  DoctorAvailability,
+  QuizRegistration,
+  Webinar,
+  WebinarRegistration
+};

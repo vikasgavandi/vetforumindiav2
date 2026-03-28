@@ -1,5 +1,5 @@
-const axios = require('axios');
-const logger = require('../middleware/logger');
+import axios from 'axios';
+import logger from '../middleware/logger.js';
 
 class ZoomService {
   constructor() {
@@ -153,4 +153,4 @@ class ZoomService {
   }
 }
 
-module.exports = new ZoomService();
+export default new ZoomService();

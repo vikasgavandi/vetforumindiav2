@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const Announcement = sequelize.define('Announcement', {
   id: {
@@ -50,4 +50,4 @@ const Announcement = sequelize.define('Announcement', {
   timestamps: true
 });
 
-module.exports = Announcement;
+export default Announcement;

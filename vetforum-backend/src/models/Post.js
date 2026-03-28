@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const Post = sequelize.define('Post', {
   id: {
@@ -22,30 +22,21 @@ const Post = sequelize.define('Post', {
       notEmpty: true
     }
   },
-  photos: {
-    type: DataTypes.JSON,
-    allowNull: true,
-    defaultValue: []
+  photo: {
+    type: DataTypes.STRING,
+    allowNull: true
   },
-  likesCount: {
+  likeCount: {
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
-  commentsCount: {
+  commentCount: {
     type: DataTypes.INTEGER,
     defaultValue: 0
-  },
-  sharesCount: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-  },
-  isActive: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true
   }
 }, {
   tableName: 'posts',
   timestamps: true
 });
 
-module.exports = Post;
+export default Post;

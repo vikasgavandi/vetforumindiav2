@@ -1,14 +1,18 @@
-const { User, UserDocument } = require('../models');
-const { generateToken } = require('../middleware/auth');
-const logger = require('../middleware/logger');
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const nodemailer = require('nodemailer');
+import { User, UserDocument } from '../models/index.js';
+import { generateToken } from '../middleware/auth.js';
+import logger from '../middleware/logger.js';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import nodemailer from 'nodemailer';
+import { saveUploadedFile, deleteImage } from '../utils/imageHandler.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // In-memory store for OTPs (For production, use Redis or a database table)
-// Format: { 'email@example.com': { otp: '123456', userData: {...}, expiresAt: Date.now() + 10 * 60 * 1000 } }
-const otpStore = new Map();
+export const otpStore = new Map();
 
 /**
  * Generates a professional, minimal HTML template for OTP emails.
@@ -81,7 +85,7 @@ const getOtpEmailTemplate = (type, firstName, otp) => {
 /**
  * Generates a professional HTML template for account approval emails.
  */
-const getApprovalEmailTemplate = (firstName) => {
+export const getApprovalEmailTemplate = (firstName) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -149,9 +153,8 @@ const getApprovalEmailTemplate = (firstName) => {
   `;
 };
 
-// Configure Nodemailer transporter (Update with real credentials for production)
 // Configure Nodemailer transporter for Hostinger (or any SMTP)
-const transporter = nodemailer.createTransport({
+export const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.EMAIL_PORT) || 465,
   secure: process.env.EMAIL_SECURE === 'true' || true,
@@ -161,7 +164,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const register = async (req, res) => {
+export const register = async (req, res) => {
   try {
     const {
       firstName,
@@ -242,9 +245,6 @@ const register = async (req, res) => {
           error: 'State is required for veterinarians'
         });
       }
-
-      // Document upload check bypassed for development/testing via curl
-      // if (uploadedFiles.length === 0) { ... }
     }
 
     // --- NEW: OTP Verification Step ---
@@ -252,44 +252,35 @@ const register = async (req, res) => {
     console.log(`[DEBUG] Received registration request for email: ${email} with OTP: ${otp}`);
     
     if (!otp) {
-        console.log(`[DEBUG] OTP missing in request body.`);
         return res.status(400).json({
             error: 'OTP is required to complete registration'
         });
     }
 
     const cachedData = otpStore.get(email);
-    console.log(`[DEBUG] Cached data for ${email}:`, cachedData);
 
     if (!cachedData || cachedData.type !== 'registration') {
-        console.log(`[DEBUG] No valid cached registration OTP data found for ${email}.`);
         return res.status(400).json({
             error: 'OTP session expired or invalid. Please request a new OTP.'
         });
     }
 
-    console.log(`[DEBUG] Current time: ${Date.now()}, Expires at: ${cachedData.expiresAt}`);
     if (Date.now() > cachedData.expiresAt) {
-        console.log(`[DEBUG] OTP expired for ${email}.`);
         otpStore.delete(email); // Clean up expired OTP
         return res.status(400).json({
             error: 'OTP has expired. Please request a new OTP.'
         });
     }
-
-    console.log(`[DEBUG] Comparing received OTP: "${otp}" (type: ${typeof otp}) with cached OTP: "${cachedData.otp}" (type: ${typeof cachedData.otp})`);
     
     // Bypass for testing
     const isTestBypass = email.endsWith('@test.com') && otp === '123456';
     
     if (String(cachedData.otp) !== String(otp) && !isTestBypass) {
-        console.log(`[DEBUG] OTP Mismatch! Expected ${cachedData.otp}, got ${otp}`);
         return res.status(400).json({
             error: 'Invalid OTP'
         });
     }
 
-    console.log(`[DEBUG] OTP Validated successfully!`);
     // OTP is valid! We can now proceed with typical user creation.
     // Clean up the store
     otpStore.delete(email);
@@ -377,9 +368,6 @@ const register = async (req, res) => {
       }
     }
 
-    // // Generate JWT token
-    // const token = generateToken(user);
-
     logger.info('User registered successfully', {
       userId: user.id,
       email: user.email,
@@ -389,7 +377,6 @@ const register = async (req, res) => {
 
     res.status(201).json({
       message: 'User registered successfully',
-      // token,
       user: user.toSafeJSON(),
       documents: uploadedDocuments
     });
@@ -414,7 +401,7 @@ const register = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -486,7 +473,7 @@ const login = async (req, res) => {
   }
 };
 
-const getProfile = async (req, res) => {
+export const getProfile = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id);
     if (!user) {
@@ -512,7 +499,7 @@ const getProfile = async (req, res) => {
   }
 };
 
-const updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
   try {
     const {
       firstName,
@@ -594,10 +581,8 @@ const updateProfile = async (req, res) => {
   }
 };
 
-const uploadProfilePhoto = async (req, res) => {
+export const uploadProfilePhoto = async (req, res) => {
   try {
-    const { saveUploadedFile, deleteImage } = require('../utils/imageHandler');
-    
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -656,10 +641,8 @@ const uploadProfilePhoto = async (req, res) => {
   }
 };
 
-const deleteProfilePhoto = async (req, res) => {
+export const deleteProfilePhoto = async (req, res) => {
   try {
-    const { deleteImage } = require('../utils/imageHandler');
-    
     const user = await User.findByPk(req.user.id);
     if (!user) {
       return res.status(404).json({
@@ -705,7 +688,7 @@ const deleteProfilePhoto = async (req, res) => {
   }
 };
 
-const sendRegistrationOTP = async (req, res) => {
+export const sendRegistrationOTP = async (req, res) => {
   try {
     const { email, firstName } = req.body;
 
@@ -747,8 +730,6 @@ const sendRegistrationOTP = async (req, res) => {
       }
     } catch (emailError) {
       logger.error('Failed to send OTP email:', emailError);
-      // In development, we might want to continue even if email fails, 
-      // but for "testing OTP service" we should probably return error if it fails to see the result.
       return res.status(500).json({ error: 'Failed to send OTP email' });
     }
 
@@ -764,7 +745,7 @@ const sendRegistrationOTP = async (req, res) => {
 };
 
 
-const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
@@ -796,7 +777,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-const verifyResetOTP = async (req, res) => {
+export const verifyResetOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
     const cachedData = otpStore.get(email);
@@ -813,7 +794,7 @@ const verifyResetOTP = async (req, res) => {
   }
 };
 
-const resetPassword = async (req, res) => {
+export const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
     const cachedData = otpStore.get(email);
@@ -834,20 +815,4 @@ const resetPassword = async (req, res) => {
     logger.error('Reset Password Error:', error);
     res.status(500).json({ error: 'Server error' });
   }
-};
-
-module.exports = {
-  register,
-  sendRegistrationOTP,
-  login,
-  getProfile,
-  updateProfile,
-  uploadProfilePhoto,
-  deleteProfilePhoto,
-  forgotPassword,
-  verifyResetOTP,
-  resetPassword,
-  otpStore,
-  transporter,
-  getApprovalEmailTemplate
 };

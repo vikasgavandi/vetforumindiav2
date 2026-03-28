@@ -1,29 +1,26 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const fs = require('fs');
-const path = require('path');
-
-// Load environment variables
-dotenv.config();
+import express from 'express';
+import cors from 'cors';
+import 'dotenv/config';
+import fs from 'fs';
+import path from 'path';
 
 // Import database and models
-const sequelize = require('./src/config/database');
+import sequelize from './src/config/database.js';
 
 // Import middleware
-const setupMiddleware = require('./src/middleware');
-// const { generalRateLimit } = require('./src/middleware/rateLimiter');
-const logger = require('./src/middleware/logger');
+import setupMiddleware from './src/middleware/index.js';
+// import { generalRateLimit } from './src/middleware/rateLimiter.js';
+import logger from './src/middleware/logger.js';
 
 // Import routes
-const mainRoutes = require('./src/routes');
+import mainRoutes from './src/routes/index.js';
 
 // Import utils
-const { seedQuizQuestions } = require('./src/utils/quizSeeder');
-const { seedAllData } = require('./src/utils/dataSeeder');
-const { seedAdminUser, seedSampleQuizCards } = require('./src/utils/adminSeeder');
-const { seedSampleBlogs } = require('./src/utils/blogSeeder');
-const { seedDoctorAvailability } = require('./src/utils/appointmentSeeder');
+import { seedQuizQuestions } from './src/utils/quizSeeder.js';
+import { seedAllData } from './src/utils/dataSeeder.js';
+import { seedAdminUser, seedSampleQuizCards } from './src/utils/adminSeeder.js';
+import { seedSampleBlogs } from './src/utils/blogSeeder.js';
+import { seedDoctorAvailability } from './src/utils/appointmentSeeder.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -256,4 +253,4 @@ process.on('SIGINT', async () => {
 // Start the server
 startServer();
 
-module.exports = { sequelize };
+export { sequelize };

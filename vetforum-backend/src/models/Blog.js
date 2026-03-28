@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const Blog = sequelize.define('Blog', {
   id: {
@@ -12,64 +12,31 @@ const Blog = sequelize.define('Blog', {
     allowNull: false,
     validate: {
       notEmpty: true,
-      len: [5, 200]
-    }
-  },
-  subtitle: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    validate: {
-      len: [0, 300]
+      len: [5, 255]
     }
   },
   content: {
-    type: DataTypes.TEXT('long'),
+    type: DataTypes.TEXT,
     allowNull: false,
     validate: {
       notEmpty: true
     }
   },
-  excerpt: {
+  description: {
     type: DataTypes.TEXT,
     allowNull: true
   },
-  featuredImage: {
-    type: DataTypes.TEXT('long'),
+  photo: {
+    type: DataTypes.STRING,
     allowNull: true
   },
-  images: {
-    type: DataTypes.JSON,
-    allowNull: true,
-    defaultValue: []
+  category: {
+    type: DataTypes.ENUM('General', 'Clinical', 'Surgery', 'Nutrition', 'Behavior'),
+    defaultValue: 'General'
   },
   tags: {
     type: DataTypes.JSON,
-    allowNull: true,
     defaultValue: []
-  },
-  readTime: {
-    type: DataTypes.INTEGER, // in minutes
-    allowNull: true
-  },
-  viewsCount: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-  },
-  likesCount: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-  },
-  commentsCount: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-  },
-  status: {
-    type: DataTypes.ENUM('draft', 'published', 'archived'),
-    defaultValue: 'draft'
-  },
-  publishedAt: {
-    type: DataTypes.DATE,
-    allowNull: true
   },
   authorId: {
     type: DataTypes.INTEGER,
@@ -79,68 +46,21 @@ const Blog = sequelize.define('Blog', {
       key: 'id'
     }
   },
-  slug: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    unique: true
+  isPublished: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  publishedAt: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  viewCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   }
 }, {
   tableName: 'blogs',
-  timestamps: true,
-  hooks: {
-    beforeCreate: (blog) => {
-      // Generate slug from title
-      if (blog.title && !blog.slug) {
-        blog.slug = blog.title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '')
-          .substring(0, 100);
-      }
-      
-      // Calculate read time (average 200 words per minute)
-      if (blog.content && !blog.readTime) {
-        const wordCount = blog.content.split(/\s+/).length;
-        blog.readTime = Math.ceil(wordCount / 200);
-      }
-      
-      // Generate excerpt if not provided
-      if (blog.content && !blog.excerpt) {
-        blog.excerpt = blog.content.substring(0, 200) + '...';
-      }
-      
-      // Set published date if status is published
-      if (blog.status === 'published' && !blog.publishedAt) {
-        blog.publishedAt = new Date();
-      }
-    },
-    beforeUpdate: (blog) => {
-      // Update slug if title changed
-      if (blog.changed('title') && blog.title) {
-        blog.slug = blog.title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '')
-          .substring(0, 100);
-      }
-      
-      // Recalculate read time if content changed
-      if (blog.changed('content') && blog.content) {
-        const wordCount = blog.content.split(/\s+/).length;
-        blog.readTime = Math.ceil(wordCount / 200);
-      }
-      
-      // Update excerpt if content changed and no custom excerpt
-      if (blog.changed('content') && blog.content && !blog.excerpt) {
-        blog.excerpt = blog.content.substring(0, 200) + '...';
-      }
-      
-      // Set published date when status changes to published
-      if (blog.changed('status') && blog.status === 'published' && !blog.publishedAt) {
-        blog.publishedAt = new Date();
-      }
-    }
-  }
+  timestamps: true
 });
 
-module.exports = Blog;
+export default Blog;

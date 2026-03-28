@@ -1,7 +1,7 @@
-const cors = require('cors');
-const compression = require('compression');
-const express = require('express');
-const logger = require('./logger');
+import cors from 'cors';
+import compression from 'compression';
+import express from 'express';
+import logger from './logger.js';
 
 // Parse CORS origins from environment variable (comma-separated)
 const corsOrigins = ['*'];
@@ -53,4 +53,4 @@ const setupMiddleware = (app) => {
   });
 };
 
-module.exports = setupMiddleware;
+export default setupMiddleware;

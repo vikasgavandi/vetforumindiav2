@@ -1,23 +1,15 @@
-const crypto = require('crypto');
-const logger = require('../middleware/logger');
+import crypto from 'crypto';
+import logger from '../middleware/logger.js';
+import Razorpay from 'razorpay';
 
 // Check if payment bypass mode is enabled
 const BYPASS_PAYMENT = process.env.PAYMENT_BYPASS_MODE === 'true';
-
-let Razorpay;
-if (!BYPASS_PAYMENT) {
-  try {
-    Razorpay = require('razorpay');
-  } catch (error) {
-    logger.warn('Razorpay package not available, payment bypass mode will be used');
-  }
-}
 
 class RazorpayService {
   constructor() {
     this.bypassMode = BYPASS_PAYMENT;
     
-    if (!this.bypassMode && Razorpay) {
+    if (!this.bypassMode) {
       this.razorpay = new Razorpay({
         key_id: process.env.RAZORPAY_KEY_ID,
         key_secret: process.env.RAZORPAY_KEY_SECRET
@@ -209,4 +201,4 @@ class RazorpayService {
   }
 }
 
-module.exports = new RazorpayService();
+export default new RazorpayService();

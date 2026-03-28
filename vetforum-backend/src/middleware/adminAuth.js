@@ -1,7 +1,7 @@
-const { User } = require('../models');
-const logger = require('./logger');
+import { User } from '../models/index.js';
+import logger from './logger.js';
 
-const requireAdmin = async (req, res, next) => {
+export const requireAdmin = async (req, res, next) => {
   try {
     // Check if user is authenticated (should be called after authenticateToken)
     if (!req.user) {
@@ -50,5 +50,3 @@ const requireAdmin = async (req, res, next) => {
     });
   }
 };
-
-module.exports = { requireAdmin };

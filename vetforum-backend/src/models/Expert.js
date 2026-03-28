@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const Expert = sequelize.define('Expert', {
   id: {
@@ -7,76 +7,42 @@ const Expert = sequelize.define('Expert', {
     primaryKey: true,
     autoIncrement: true
   },
-  name: {
-    type: DataTypes.STRING,
+  userId: {
+    type: DataTypes.INTEGER,
     allowNull: false,
-    validate: {
-      notEmpty: true,
-      len: [2, 100]
+    unique: true,
+    references: {
+      model: 'users',
+      key: 'id'
     }
-  },
-  designation: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true
-    }
-  },
-  qualification: {
-    type: DataTypes.TEXT,
-    allowNull: true
   },
   specialization: {
     type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: true
-    }
+    allowNull: false
   },
-  yearsOfExperience: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    validate: {
-      min: 0
-    }
-  },
-  publications: {
-    type: DataTypes.JSON,
-    allowNull: true,
-    defaultValue: []
-  },
-  awards: {
-    type: DataTypes.JSON,
-    allowNull: true,
-    defaultValue: []
-  },
-  professionalPhoto: {
-    type: DataTypes.STRING,
-    allowNull: true
+  experience: {
+    type: DataTypes.INTEGER, // years
+    allowNull: false
   },
   consultationFee: {
     type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 500.00
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  phone: {
-    type: DataTypes.STRING,
-    allowNull: true
+    allowNull: false
   },
   bio: {
     type: DataTypes.TEXT,
     allowNull: true
   },
-  userId: {
+  availableDays: {
+    type: DataTypes.JSON, // e.g., ["Monday", "Wednesday", "Friday"]
+    defaultValue: []
+  },
+  rating: {
+    type: DataTypes.DECIMAL(3, 2),
+    defaultValue: 0.00
+  },
+  reviewCount: {
     type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: 'users',
-      key: 'id'
-    }
+    defaultValue: 0
   },
   isActive: {
     type: DataTypes.BOOLEAN,
@@ -87,4 +53,4 @@ const Expert = sequelize.define('Expert', {
   timestamps: true
 });
 
-module.exports = Expert;
+export default Expert;

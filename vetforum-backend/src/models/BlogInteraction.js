@@ -1,19 +1,11 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const BlogInteraction = sequelize.define('BlogInteraction', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'users',
-      key: 'id'
-    }
   },
   blogId: {
     type: DataTypes.INTEGER,
@@ -23,13 +15,17 @@ const BlogInteraction = sequelize.define('BlogInteraction', {
       key: 'id'
     }
   },
-  type: {
-    type: DataTypes.ENUM('like', 'comment', 'view'),
-    allowNull: false
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
   },
-  content: {
-    type: DataTypes.TEXT,
-    allowNull: true // Only for comments
+  type: {
+    type: DataTypes.ENUM('like', 'save', 'share'),
+    allowNull: false
   }
 }, {
   tableName: 'blog_interactions',
@@ -37,12 +33,9 @@ const BlogInteraction = sequelize.define('BlogInteraction', {
   indexes: [
     {
       unique: true,
-      fields: ['userId', 'blogId', 'type'],
-      where: {
-        type: ['like', 'view']
-      }
+      fields: ['blogId', 'userId', 'type']
     }
   ]
 });
 
-module.exports = BlogInteraction;
+export default BlogInteraction;
