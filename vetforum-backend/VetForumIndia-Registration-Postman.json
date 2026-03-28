@@ -1,0 +1,102 @@
+{
+  "info": {
+    "name": "VetForumIndia Registration API",
+    "description": "Postman collection for VetForumIndia registration endpoint",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register Veterinarian User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"test\",\n  \"lastName\": \"test\",\n  \"email\": \"test@test.com\",\n  \"mobile\": 9876543210,\n  \"state\": \"Maharashtra\",\n  \"password\": \"test12\",\n  \"confirmPassword\": \"test12\",\n  \"isVeterinarian\": true,\n  \"vetRegNo\": 1234567,\n  \"qualification\": \"BVSc\",\n  \"document\": \"(binary)\",\n  \"veterinarianType\": \"graduated\",\n  \"veterinarianState\": \"Maharashtra\"\n}"
+        },
+        "url": {
+          "raw": "https://vetforumindia.com/api/vetforumindia/v1/authentication/register",
+          "protocol": "https",
+          "host": [
+            "vetforumindia",
+            "com"
+          ],
+          "path": [
+            "api",
+            "vetforumindia",
+            "v1",
+            "authentication",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Register Non-Veterinarian User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"test\",\n  \"lastName\": \"test\",\n  \"email\": \"nonvet@test.com\",\n  \"mobile\": 9876543211,\n  \"state\": \"Karnataka\",\n  \"password\": \"test12\",\n  \"confirmPassword\": \"test12\",\n  \"isVeterinarian\": false\n}"
+        },
+        "url": {
+          "raw": "https://vetforumindia.com/api/vetforumindia/v1/authentication/register",
+          "protocol": "https",
+          "host": [
+            "vetforumindia",
+            "com"
+          ],
+          "path": [
+            "api",
+            "vetforumindia",
+            "v1",
+            "authentication",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Register Graduated Veterinarian",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"test\",\n  \"lastName\": \"test\",\n  \"email\": \"graduated@test.com\",\n  \"mobile\": 9876543212,\n  \"state\": \"Tamil Nadu\",\n  \"password\": \"test12\",\n  \"confirmPassword\": \"test12\",\n  \"isVeterinarian\": true,\n  \"vetRegNo\": 1234568,\n  \"qualification\": \"MVSc\",\n  \"document\": \"(binary)\",\n  \"veterinarianType\": \"graduated\",\n  \"veterinarianState\": \"Tamil Nadu\"\n}"
+        },
+        "url": {
+          "raw": "https://vetforumindia.com/api/vetforumindia/v1/authentication/register",
+          "protocol": "https",
+          "host": [
+            "vetforumindia",
+            "com"
+          ],
+          "path": [
+            "api",
+            "vetforumindia",
+            "v1",
+            "authentication",
+            "register"
+          ]
+        }
+      }
+    }
+  ]
+}

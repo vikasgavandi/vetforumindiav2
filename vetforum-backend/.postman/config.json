@@ -1,0 +1,16 @@
+{
+  "workspace": {
+    "id": "0cbffb19-a49c-4947-9ae2-89c5cfc24cb3"
+  },
+  "entities": {
+    "environments": [],
+    "flows": [],
+    "globals": [],
+    "mocks": [],
+    "specs": [],
+    "collections": [
+      "../VetForumIndia-API-Postman-Collection.json",
+      "../VetForumIndia-Registration-Postman.json"
+    ]
+  }
+}

@@ -1,0 +1,224 @@
+{
+  "info": {
+    "name": "VetForumIndia Registration API - Form Data",
+    "description": "Postman collection for VetForumIndia registration with file upload support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register Veterinarian with Documents",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "firstName",
+              "value": "test",
+              "type": "text"
+            },
+            {
+              "key": "lastName",
+              "value": "test",
+              "type": "text"
+            },
+            {
+              "key": "email",
+              "value": "vet@test.com",
+              "type": "text"
+            },
+            {
+              "key": "mobile",
+              "value": "9876543210",
+              "type": "text"
+            },
+            {
+              "key": "state",
+              "value": "Maharashtra",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "test12",
+              "type": "text"
+            },
+            {
+              "key": "confirmPassword",
+              "value": "test12",
+              "type": "text"
+            },
+            {
+              "key": "isVeterinarian",
+              "value": "true",
+              "type": "text"
+            },
+            {
+              "key": "veterinarianType",
+              "value": "Graduated",
+              "type": "text"
+            },
+            {
+              "key": "veterinarianState",
+              "value": "Maharashtra",
+              "type": "text"
+            },
+            {
+              "key": "documents",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://vetforumindia.com/api/vetforumindia/v1/authentication/register",
+          "protocol": "https",
+          "host": [
+            "vetforumindia",
+            "com"
+          ],
+          "path": [
+            "api",
+            "vetforumindia",
+            "v1",
+            "authentication",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Register Student Veterinarian",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "firstName",
+              "value": "test",
+              "type": "text"
+            },
+            {
+              "key": "lastName",
+              "value": "student",
+              "type": "text"
+            },
+            {
+              "key": "email",
+              "value": "student@test.com",
+              "type": "text"
+            },
+            {
+              "key": "mobile",
+              "value": "9876543211",
+              "type": "text"
+            },
+            {
+              "key": "state",
+              "value": "Karnataka",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "test12",
+              "type": "text"
+            },
+            {
+              "key": "confirmPassword",
+              "value": "test12",
+              "type": "text"
+            },
+            {
+              "key": "isVeterinarian",
+              "value": "true",
+              "type": "text"
+            },
+            {
+              "key": "veterinarianType",
+              "value": "Student",
+              "type": "text"
+            },
+            {
+              "key": "yearOfStudy",
+              "value": "3rd",
+              "type": "text"
+            },
+            {
+              "key": "college",
+              "value": "Veterinary College",
+              "type": "text"
+            },
+            {
+              "key": "university",
+              "value": "Karnataka Veterinary University",
+              "type": "text"
+            },
+            {
+              "key": "studentId",
+              "value": "VET2023001",
+              "type": "text"
+            },
+            {
+              "key": "veterinarianState",
+              "value": "Karnataka",
+              "type": "text"
+            },
+            {
+              "key": "documents",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://vetforumindia.com/api/vetforumindia/v1/authentication/register",
+          "protocol": "https",
+          "host": [
+            "vetforumindia",
+            "com"
+          ],
+          "path": [
+            "api",
+            "vetforumindia",
+            "v1",
+            "authentication",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Register Non-Veterinarian",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"test\",\n  \"lastName\": \"user\",\n  \"email\": \"nonvet@test.com\",\n  \"mobile\": 9876543212,\n  \"state\": \"Tamil Nadu\",\n  \"password\": \"test12\",\n  \"confirmPassword\": \"test12\",\n  \"isVeterinarian\": false\n}"
+        },
+        "url": {
+          "raw": "https://vetforumindia.com/api/vetforumindia/v1/authentication/register",
+          "protocol": "https",
+          "host": [
+            "vetforumindia",
+            "com"
+          ],
+          "path": [
+            "api",
+            "vetforumindia",
+            "v1",
+            "authentication",
+            "register"
+          ]
+        }
+      }
+    }
+  ]
+}

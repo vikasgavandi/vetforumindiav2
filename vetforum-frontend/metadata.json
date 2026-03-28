@@ -1,0 +1,8 @@
+{
+  "name": "vetforumindia",
+  "description": "A comprehensive veterinary consultation platform connecting pet owners with professionals, featuring video consultations, community forums, and AI-powered assistance.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

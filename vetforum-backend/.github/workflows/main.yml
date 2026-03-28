@@ -1,0 +1,58 @@
+name: VetForum Backend CI/CD
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci || npm install
+      
+    - name: Check for security vulnerabilities
+      run: npm audit --audit-level=high || true
+      
+    - name: Run build check
+      run: npm run build --if-present
+
+    # - name: Run tests (Uncomment when tests are added)
+    #   run: npm test
+
+  # Only deploy on pushes to main branch
+  deploy-to-hostinger:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOSTINGER_VPS_IP }}
+        username: ${{ secrets.HOSTINGER_VPS_USER }}
+        key: ${{ secrets.HOSTINGER_SSH_KEY }}
+        port: 22
+        script: |
+          cd ${{ secrets.DEPLOY_PATH }}/vetforum-backend
+          git pull origin main
+          npm install --production
+          # Restart with PM2 or start if not running
+          pm2 restart vetforum-backend || pm2 start server.js --name vetforum-backend
+          pm2 save
