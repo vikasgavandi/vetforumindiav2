@@ -156,8 +156,8 @@ export const getApprovalEmailTemplate = (firstName) => {
 // Configure Nodemailer transporter for Hostinger (or any SMTP)
 export const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.EMAIL_PORT) || 465,
-  secure: process.env.EMAIL_SECURE === 'true' || true,
+  port: parseInt(process.env.EMAIL_PORT || '465'),
+  secure: process.env.EMAIL_SECURE === 'true', // Fixed: correctly parse boolean from string
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
