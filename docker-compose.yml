@@ -10,7 +10,7 @@ services:
 
   backend:
     build: ./vetforum-backend
-    image: vetforumindia-backend:latest
+    image: ${BACKEND_IMAGE:-vetforumindia-backend:latest}
     restart: always
     ports:
       - "4000:4000"
@@ -29,7 +29,7 @@ services:
 
   frontend:
     build: ./vetforum-frontend
-    image: vetforumindia-frontend:latest
+    image: ${FRONTEND_IMAGE:-vetforumindia-frontend:latest}
     restart: always
     ports:
       - "8081:80"
