@@ -729,8 +729,9 @@ export const sendRegistrationOTP = async (req, res) => {
         console.log(`[SIMULATED EMAIL/BYPASS] To: ${email} | Subject: OTP | Body: ${otp}`);
       }
     } catch (emailError) {
+      console.error('❌ EMAIL SENDING ERROR:', emailError);
       logger.error('Failed to send OTP email:', emailError);
-      return res.status(500).json({ error: 'Failed to send OTP email' });
+      return res.status(500).json({ error: 'Failed to send OTP email', details: emailError.message });
     }
 
     res.status(200).json({ 
