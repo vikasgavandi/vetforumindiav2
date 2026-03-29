@@ -51,7 +51,9 @@ jobs:
             cd /root/vetforumindiav2
             git fetch origin main
             git reset --hard origin/main
-            # Inject production secrets into a .env file for Docker
+            
+            # Inject production secrets into a .env file for the Backend
+            cd vetforum-backend
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env
             echo "RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}" >> .env
             echo "RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET }}" >> .env
@@ -67,8 +69,16 @@ jobs:
             echo "EMAIL_PORT=${{ secrets.EMAIL_PORT }}" >> .env
             echo "EMAIL_SECURE=${{ secrets.EMAIL_SECURE }}" >> .env
             echo "EMAIL_FROM=${{ secrets.EMAIL_FROM }}" >> .env
-            echo "BACKEND_IMAGE=vetforumindia-backend:latest" >> .env
-            echo "FRONTEND_IMAGE=vetforumindia-frontend:latest" >> .env
-            # Start/Restart the containers with a fresh build
-            docker compose down
-            docker compose up -d --build --force-recreate
+            
+            # Install Backend dependencies
+            npm install --production
+            
+            # Build Frontend
+            cd ../vetforum-frontend
+            npm install
+            npm run build
+            
+            # Return to root and restart via PM2
+            cd ..
+            pm2 startOrReload ecosystem.config.js --update-env
+            pm2 save
