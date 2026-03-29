@@ -34,7 +34,6 @@ export const seedAllData = async () => {
         organization: 'City Animal Hospital',
         location: 'Mumbai, Maharashtra',
         salary: '₹80,000 - ₹1,20,000 per month',
-        experience: '5+ years',
         jobDescription: 'Looking for an experienced surgeon for specialized soft tissue and orthopedic surgeries.',
         qualification: 'MVSc (Surgery), Registered with VCI',
         designation: 'Senior Surgeon',
