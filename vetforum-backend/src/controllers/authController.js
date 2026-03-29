@@ -153,16 +153,18 @@ export const getApprovalEmailTemplate = (firstName) => {
   `;
 };
 
-// Configure Nodemailer transporter for Hostinger (or any SMTP)
-export const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.EMAIL_PORT || '465'),
-  secure: process.env.EMAIL_SECURE === 'true', // Fixed: correctly parse boolean from string
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+// Helper to get a fresh Nodemailer transporter
+export const getTransporter = () => {
+  return nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_PORT || '465'),
+    secure: process.env.EMAIL_SECURE === 'true',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+};
 
 export const register = async (req, res) => {
   try {
@@ -722,7 +724,7 @@ export const sendRegistrationOTP = async (req, res) => {
 
     try {
       if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        await transporter.sendMail(mailOptions);
+        await getTransporter().sendMail(mailOptions);
         logger.info(`OTP email sent successfully to ${email}`);
       } else {
         logger.warn(`Email credentials missing, skipping real email send for ${email}`);
@@ -762,7 +764,7 @@ export const forgotPassword = async (req, res) => {
     };
     try {
       if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        await transporter.sendMail(mailOptions);
+        await getTransporter().sendMail(mailOptions);
         logger.info('Password reset OTP sent to ' + email);
       } else {
         console.log('[FORGOT PASSWORD BYPASS] To: ' + email + ' | OTP: ' + otp);
