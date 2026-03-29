@@ -1,7 +1,12 @@
-const mysql = require('mysql2/promise');
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config();
+import mysql from 'mysql2/promise';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import 'dotenv/config';
+import sequelize from './src/config/database.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
@@ -113,7 +118,6 @@ async function setupDatabase() {
     
     // Test Sequelize connection
     console.log('\n🔧 Testing Sequelize connection...');
-    const sequelize = require('./src/config/database');
     await sequelize.authenticate();
     console.log('✅ Sequelize connection successful!');
     
