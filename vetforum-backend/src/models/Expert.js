@@ -57,7 +57,8 @@ const Expert = sequelize.define('Expert', {
   },
   userId: {
     type: DataTypes.INTEGER,
-    allowNull: true,
+    allowNull: false,
+    onDelete: 'CASCADE',
     references: {
       model: 'users',
       key: 'id'

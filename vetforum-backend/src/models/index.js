@@ -239,12 +239,15 @@ UserDocument.belongsTo(User, {
 // Expert-User association
 Expert.belongsTo(User, {
   foreignKey: 'userId',
-  as: 'userAccount'
+  as: 'userAccount',
+  onDelete: 'CASCADE'
 });
 
 User.hasOne(Expert, {
   foreignKey: 'userId',
-  as: 'expertProfile'
+  as: 'expertProfile',
+  onDelete: 'CASCADE',
+  hooks: true
 });
 
 // Quiz registration associations
