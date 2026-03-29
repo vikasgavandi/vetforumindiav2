@@ -714,7 +714,7 @@ export const sendRegistrationOTP = async (req, res) => {
 
     // Send Email
     const mailOptions = {
-      from: `"Vet Forum India" <support@vetforumindia.com>`,
+      from: process.env.EMAIL_FROM || `"Vet Forum India" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Your Verification Code - Vet Forum India',
       html: getOtpEmailTemplate('registration', firstName, otp)
@@ -754,7 +754,7 @@ export const forgotPassword = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     otpStore.set(email, { otp, type: 'password_reset', expiresAt: Date.now() + 10 * 60 * 1000 });
     const mailOptions = {
-      from: '"Vet Forum India" <support@vetforumindia.com>',
+      from: process.env.EMAIL_FROM || `"Vet Forum India" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Password Reset Code - Vet Forum India',
       html: getOtpEmailTemplate('password_reset', user.firstName, otp)
