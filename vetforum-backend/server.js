@@ -67,9 +67,8 @@ const startServer = async () => {
       logger.info(`Database connection established successfully`);
       logger.info(`Database: ${process.env.DB_NAME} on ${process.env.DB_HOST}:${process.env.DB_PORT}`);
 
-      // Sync database models (do NOT alter existing tables to avoid key conflicts)
-      // Schema should be managed via DATABASE_SCHEMA.sql  
-      await sequelize.sync({ force: false, alter: false });
+      // Sync database models (temporarily set alter: true to update schema on VPS)
+      await sequelize.sync({ force: false, alter: true });
       logger.info(`Database models synchronized - using existing schema`);
 
       // Seed data if in development mode
