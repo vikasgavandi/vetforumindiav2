@@ -17,6 +17,8 @@ export const seedAdminUser = async () => {
         lastName: 'Admin',
         email: adminEmail,
         password: hashedPassword,
+        mobile: '9000000000',
+        state: 'Maharashtra',
         isAdmin: true,
         approvalStatus: 'approved'
       });
