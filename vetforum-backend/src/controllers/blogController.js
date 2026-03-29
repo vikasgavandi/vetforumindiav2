@@ -34,11 +34,12 @@ export const createBlog = async (req, res) => {
       title,
       subtitle,
       content,
-      description: excerpt, // Map excerpt to description in model
-      photo: savedFilename,  // Map featuredImage to photo in model
+      excerpt,
+      featuredImage: savedFilename,
+      images: images ? (typeof images === 'string' ? JSON.parse(images) : images) : [],
       tags: tags ? (Array.isArray(tags) ? tags : JSON.parse(tags)) : [],
-      category: req.body.category || 'General',
-      isPublished: status === 'published',
+      status: status || 'draft',
+      publishedAt: status === 'published' ? new Date() : null,
       authorId
     });
 
@@ -71,7 +72,7 @@ export const createBlog = async (req, res) => {
   }
 };
 
-// Get All Blogs (Published only for non-authors)
+// Get All Blogs
 export const getBlogs = async (req, res) => {
   try {
     const { page = 1, limit = 10, status, tags, authorId, search } = req.query;
@@ -80,11 +81,11 @@ export const getBlogs = async (req, res) => {
 
     const whereClause = {};
 
-    // Filter by isPublished defaults to true for public users
+    // For non-admins and non-authors, only show published blogs
     if (!req.user?.isAdmin && authorId !== userId?.toString()) {
-      whereClause.isPublished = true;
+      whereClause.status = 'published';
     } else if (status) {
-      whereClause.isPublished = (status === 'published');
+      whereClause.status = status;
     }
 
     if (authorId) {
@@ -100,6 +101,7 @@ export const getBlogs = async (req, res) => {
     if (search) {
       whereClause[Op.or] = [
         { title: { [Op.like]: `%${search}%` } },
+        { subtitle: { [Op.like]: `%${search}%` } },
         { content: { [Op.like]: `%${search}%` } }
       ];
     }
@@ -135,7 +137,7 @@ export const getBlogs = async (req, res) => {
   }
 };
 
-// Get Blog by ID or Slug
+// Get Blog by ID
 export const getBlogById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -164,22 +166,17 @@ export const getBlogById = async (req, res) => {
       });
     }
 
-    // Check if user can view this blog
-    if (!blog.isPublished) {
-      // Author aur admin ko allow hai
-      if (blog.authorId === userId || req.user?.isAdmin) {
-        // allowed, kuch mat karo
-      } else {
+    // Check permissions
+    if (blog.status !== 'published') {
+      if (blog.authorId !== userId && !req.user?.isAdmin) {
         return res.status(403).json({
           success: false,
-          errorCode: 'BLOG_NOT_PUBLISHED',
           message: 'This blog is not published yet.'
         });
       }
     }
 
-
-    // Track view if user is authenticated and not the author
+    // Track view
     if (userId && userId !== blog.authorId) {
       const existingView = await BlogInteraction.findOne({
         where: { userId, blogId: blog.id, type: 'view' }
@@ -191,7 +188,7 @@ export const getBlogById = async (req, res) => {
           blogId: blog.id,
           type: 'view'
         });
-        await blog.increment('viewCount');
+        await blog.increment('viewsCount');
       }
     }
 
@@ -223,7 +220,6 @@ export const updateBlog = async (req, res) => {
       });
     }
 
-    // Check permissions
     if (blog.authorId !== userId && !req.user.isAdmin) {
       return res.status(403).json({
         success: false,
@@ -240,27 +236,33 @@ export const updateBlog = async (req, res) => {
     if (req.file) {
       const savedFilename = await saveUploadedFile(req.file, 'blogs');
       if (savedFilename) {
-        if (blog.photo) {
-          deleteImage(blog.photo, 'blogs');
+        if (blog.featuredImage) {
+          deleteImage(blog.featuredImage, 'blogs');
         }
-        updateData.photo = savedFilename;
+        updateData.featuredImage = savedFilename;
       }
     } else if (featuredImage !== undefined) {
       if (featuredImage && featuredImage.startsWith('data:image/')) {
         const savedFilename = await saveBase64Image(featuredImage, 'blogs');
         if (savedFilename) {
-          if (blog.photo) {
-            deleteImage(blog.photo, 'blogs');
+          if (blog.featuredImage) {
+            deleteImage(blog.featuredImage, 'blogs');
           }
-          updateData.photo = savedFilename;
+          updateData.featuredImage = savedFilename;
         }
       } else {
-        updateData.photo = featuredImage;
+        updateData.featuredImage = featuredImage;
       }
     }
     
+    if (images) updateData.images = typeof images === 'string' ? JSON.parse(images) : images;
     if (tags) updateData.tags = typeof tags === 'string' ? JSON.parse(tags) : tags;
-    if (status) updateData.isPublished = status === 'published';
+    if (status) {
+      updateData.status = status;
+      if (status === 'published' && !blog.publishedAt) {
+        updateData.publishedAt = new Date();
+      }
+    }
 
     await blog.update(updateData);
 
@@ -270,11 +272,6 @@ export const updateBlog = async (req, res) => {
         as: 'author',
         attributes: { exclude: ['password'] }
       }]
-    });
-
-    logger.info('Blog updated', {
-      blogId: id,
-      updatedBy: userId
     });
 
     res.json({
@@ -291,56 +288,14 @@ export const updateBlog = async (req, res) => {
   }
 };
 
-// Delete Blog
-export const deleteBlog = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user.id;
-
-    const blog = await Blog.findByPk(id);
-    if (!blog) {
-      return res.status(404).json({
-        success: false,
-        message: 'Blog not found'
-      });
-    }
-
-    // Check permissions
-    if (blog.authorId !== userId && !req.user.isAdmin) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied'
-      });
-    }
-
-    await blog.destroy();
-
-    logger.info('Blog deleted', {
-      blogId: id,
-      deletedBy: userId
-    });
-
-    res.json({
-      success: true,
-      message: 'Blog deleted successfully'
-    });
-  } catch (error) {
-    logger.error('Error deleting blog:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete blog'
-    });
-  }
-};
-
-// Like/Unlike Blog
+// Toggle Like
 export const toggleLike = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
 
     const blog = await Blog.findByPk(id);
-    if (!blog || !blog.isPublished) {
+    if (!blog || blog.status !== 'published') {
       return res.status(404).json({
         success: false,
         message: 'Blog not found'
@@ -353,24 +308,12 @@ export const toggleLike = async (req, res) => {
 
     if (existingLike) {
       await existingLike.destroy();
-
-      res.json({
-        success: true,
-        message: 'Blog unliked',
-        liked: false
-      });
+      await blog.decrement('likesCount');
+      res.json({ success: true, message: 'Blog unliked', liked: false });
     } else {
-      await BlogInteraction.create({
-        userId,
-        blogId: id,
-        type: 'like'
-      });
-
-      res.json({
-        success: true,
-        message: 'Blog liked',
-        liked: true
-      });
+      await BlogInteraction.create({ userId, blogId: id, type: 'like' });
+      await blog.increment('likesCount');
+      res.json({ success: true, message: 'Blog liked', liked: true });
     }
   } catch (error) {
     logger.error('Error toggling like:', error);
@@ -389,18 +332,12 @@ export const addComment = async (req, res) => {
     const userId = req.user.id;
 
     if (!content) {
-      return res.status(400).json({
-        success: false,
-        message: 'Comment content is required'
-      });
+      return res.status(400).json({ success: false, message: 'Comment content is required' });
     }
 
     const blog = await Blog.findByPk(id);
-    if (!blog || !blog.isPublished) {
-      return res.status(404).json({
-        success: false,
-        message: 'Blog not found'
-      });
+    if (!blog || blog.status !== 'published') {
+      return res.status(404).json({ success: false, message: 'Blog not found' });
     }
 
     const comment = await BlogInteraction.create({
@@ -409,6 +346,8 @@ export const addComment = async (req, res) => {
       type: 'comment',
       content
     });
+
+    await blog.increment('commentsCount');
 
     const commentWithUser = await BlogInteraction.findByPk(comment.id, {
       include: [{
@@ -467,5 +406,28 @@ export const getBlogComments = async (req, res) => {
       success: false,
       message: 'Failed to fetch comments'
     });
+  }
+};
+
+// Delete Blog
+export const deleteBlog = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const blog = await Blog.findByPk(id);
+    if (!blog) {
+      return res.status(404).json({ success: false, message: 'Blog not found' });
+    }
+
+    if (blog.authorId !== userId && !req.user.isAdmin) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+
+    await blog.destroy();
+    res.json({ success: true, message: 'Blog deleted successfully' });
+  } catch (error) {
+    logger.error('Error deleting blog:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete blog' });
   }
 };

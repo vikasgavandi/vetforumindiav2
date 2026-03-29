@@ -22,17 +22,26 @@ const Post = sequelize.define('Post', {
       notEmpty: true
     }
   },
-  photo: {
-    type: DataTypes.STRING,
-    allowNull: true
+  photos: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
   },
-  likeCount: {
+  likesCount: {
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
-  commentCount: {
+  commentsCount: {
     type: DataTypes.INTEGER,
     defaultValue: 0
+  },
+  sharesCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
   }
 }, {
   tableName: 'posts',

@@ -11,7 +11,7 @@ export const createPost = async (req, res) => {
     const post = await Post.create({
       userId,
       content,
-      photo: photos && photos.length > 0 ? photos[0] : null
+      photos
     });
 
     const postWithAuthor = await Post.findByPk(post.id, {
@@ -43,6 +43,7 @@ export const getPosts = async (req, res) => {
     const offset = (page - 1) * limit;
 
     const posts = await Post.findAndCountAll({
+      where: { isActive: true },
       include: [{
         model: User,
         as: 'author',
@@ -81,7 +82,8 @@ export const getUserPosts = async (req, res) => {
 
     const posts = await Post.findAndCountAll({
       where: { 
-        userId: userId || req.user.id
+        userId: userId || req.user.id,
+        isActive: true
       },
       include: [{
         model: User,
@@ -120,10 +122,7 @@ export const toggleLike = async (req, res) => {
 
     const post = await Post.findByPk(postId);
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: 'Post not found'
-      });
+      return res.status(404).json({ success: false, message: 'Post not found' });
     }
 
     const existingLike = await PostInteraction.findOne({
@@ -131,36 +130,17 @@ export const toggleLike = async (req, res) => {
     });
 
     if (existingLike) {
-      // Unlike
       await existingLike.destroy();
-      await post.decrement('likeCount');
-      
-      res.json({
-        success: true,
-        message: 'Post unliked',
-        liked: false
-      });
+      await post.decrement('likesCount');
+      res.json({ success: true, message: 'Post unliked', liked: false });
     } else {
-      // Like
-      await PostInteraction.create({
-        userId,
-        postId,
-        type: 'like'
-      });
-      await post.increment('likeCount');
-      
-      res.json({
-        success: true,
-        message: 'Post liked',
-        liked: true
-      });
+      await PostInteraction.create({ userId, postId, type: 'like' });
+      await post.increment('likesCount');
+      res.json({ success: true, message: 'Post liked', liked: true });
     }
   } catch (error) {
     logger.error('Error toggling like:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to toggle like'
-    });
+    res.status(500).json({ success: false, message: 'Failed to toggle like' });
   }
 };
 
@@ -172,29 +152,22 @@ export const addComment = async (req, res) => {
     const userId = req.user.id;
 
     if (!content || content.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: 'Comment content is required'
-      });
+      return res.status(400).json({ success: false, message: 'Comment content is required' });
     }
 
     const post = await Post.findByPk(postId);
-
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: 'Post not found'
-      });
+      return res.status(404).json({ success: false, message: 'Post not found' });
     }
-    console.log(userId,postId,content);
+
     const comment = await PostInteraction.create({
       userId,
       postId,
       type: 'comment',
       content
     });
-    console.log(comment);
-    await post.increment('commentCount');
+
+    await post.increment('commentsCount');
 
     const commentWithUser = await PostInteraction.findByPk(comment.id, {
       include: [{
@@ -210,13 +183,8 @@ export const addComment = async (req, res) => {
       data: commentWithUser
     });
   } catch (error) {
-    console.log(error);
     logger.error('Error adding comment:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to add comment',
-      error:error
-    });
+    res.status(500).json({ success: false, message: 'Failed to add comment' });
   }
 };
 
@@ -251,10 +219,7 @@ export const getPostComments = async (req, res) => {
     });
   } catch (error) {
     logger.error('Error fetching comments:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch comments'
-    });
+    res.status(500).json({ success: false, message: 'Failed to fetch comments' });
   }
 };
 
@@ -266,10 +231,7 @@ export const sharePost = async (req, res) => {
 
     const post = await Post.findByPk(postId);
     if (!post) {
-      return res.status(404).json({
-        success: false,
-        message: 'Post not found'
-      });
+      return res.status(404).json({ success: false, message: 'Post not found' });
     }
 
     const existingShare = await PostInteraction.findOne({
@@ -277,23 +239,13 @@ export const sharePost = async (req, res) => {
     });
 
     if (!existingShare) {
-      await PostInteraction.create({
-        userId,
-        postId,
-        type: 'share'
-      });
-      // Note: sharesCount is not in Post model, skipping increment
+      await PostInteraction.create({ userId, postId, type: 'share' });
+      await post.increment('sharesCount');
     }
 
-    res.json({
-      success: true,
-      message: 'Post shared successfully'
-    });
+    res.json({ success: true, message: 'Post shared successfully' });
   } catch (error) {
     logger.error('Error sharing post:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to share post'
-    });
+    res.status(500).json({ success: false, message: 'Failed to share post' });
   }
 };

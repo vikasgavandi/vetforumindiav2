@@ -7,42 +7,61 @@ const Expert = sequelize.define('Expert', {
     primaryKey: true,
     autoIncrement: true
   },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    unique: true,
-    references: {
-      model: 'users',
-      key: 'id'
-    }
+  name: {
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
+  designation: {
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
+  qualification: {
+    type: DataTypes.TEXT,
+    allowNull: true
   },
   specialization: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(100),
     allowNull: false
   },
-  experience: {
-    type: DataTypes.INTEGER, // years
+  yearsOfExperience: {
+    type: DataTypes.INTEGER,
     allowNull: false
+  },
+  publications: {
+    type: DataTypes.JSON,
+    allowNull: true
+  },
+  awards: {
+    type: DataTypes.JSON,
+    allowNull: true
+  },
+  professionalPhoto: {
+    type: DataTypes.STRING(255),
+    allowNull: true
   },
   consultationFee: {
     type: DataTypes.DECIMAL(10, 2),
-    allowNull: false
+    defaultValue: 500.00
+  },
+  email: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
   },
   bio: {
     type: DataTypes.TEXT,
     allowNull: true
   },
-  availableDays: {
-    type: DataTypes.JSON, // e.g., ["Monday", "Wednesday", "Friday"]
-    defaultValue: []
-  },
-  rating: {
-    type: DataTypes.DECIMAL(3, 2),
-    defaultValue: 0.00
-  },
-  reviewCount: {
+  userId: {
     type: DataTypes.INTEGER,
-    defaultValue: 0
+    allowNull: true,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
   },
   isActive: {
     type: DataTypes.BOOLEAN,

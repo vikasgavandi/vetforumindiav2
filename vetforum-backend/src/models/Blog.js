@@ -15,6 +15,10 @@ const Blog = sequelize.define('Blog', {
       len: [5, 255]
     }
   },
+  subtitle: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   content: {
     type: DataTypes.TEXT,
     allowNull: false,
@@ -22,21 +26,47 @@ const Blog = sequelize.define('Blog', {
       notEmpty: true
     }
   },
-  description: {
+  excerpt: {
     type: DataTypes.TEXT,
     allowNull: true
   },
-  photo: {
+  featuredImage: {
     type: DataTypes.STRING,
     allowNull: true
   },
-  category: {
-    type: DataTypes.ENUM('General', 'Clinical', 'Surgery', 'Nutrition', 'Behavior'),
-    defaultValue: 'General'
+  images: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
   },
   tags: {
     type: DataTypes.JSON,
+    allowNull: true,
     defaultValue: []
+  },
+  readTime: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  viewsCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  likesCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  commentsCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  status: {
+    type: DataTypes.ENUM('draft', 'published', 'archived'),
+    defaultValue: 'draft'
+  },
+  publishedAt: {
+    type: DataTypes.DATE,
+    allowNull: true
   },
   authorId: {
     type: DataTypes.INTEGER,
@@ -46,17 +76,10 @@ const Blog = sequelize.define('Blog', {
       key: 'id'
     }
   },
-  isPublished: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
-  },
-  publishedAt: {
-    type: DataTypes.DATE,
-    allowNull: true
-  },
-  viewCount: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
+  slug: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true
   }
 }, {
   tableName: 'blogs',
