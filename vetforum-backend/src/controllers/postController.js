@@ -43,7 +43,6 @@ export const getPosts = async (req, res) => {
     const offset = (page - 1) * limit;
 
     const posts = await Post.findAndCountAll({
-      where: { isActive: true },
       include: [{
         model: User,
         as: 'author',
@@ -82,8 +81,7 @@ export const getUserPosts = async (req, res) => {
 
     const posts = await Post.findAndCountAll({
       where: { 
-        userId: userId || req.user.id,
-        isActive: true 
+        userId: userId || req.user.id
       },
       include: [{
         model: User,
@@ -121,7 +119,7 @@ export const toggleLike = async (req, res) => {
     const userId = req.user.id;
 
     const post = await Post.findByPk(postId);
-    if (!post || !post.isActive) {
+    if (!post) {
       return res.status(404).json({
         success: false,
         message: 'Post not found'
@@ -135,7 +133,7 @@ export const toggleLike = async (req, res) => {
     if (existingLike) {
       // Unlike
       await existingLike.destroy();
-      await post.decrement('likesCount');
+      await post.decrement('likeCount');
       
       res.json({
         success: true,
@@ -149,7 +147,7 @@ export const toggleLike = async (req, res) => {
         postId,
         type: 'like'
       });
-      await post.increment('likesCount');
+      await post.increment('likeCount');
       
       res.json({
         success: true,
@@ -182,7 +180,7 @@ export const addComment = async (req, res) => {
 
     const post = await Post.findByPk(postId);
 
-    if (!post || !post.isActive) {
+    if (!post) {
       return res.status(404).json({
         success: false,
         message: 'Post not found'
@@ -196,7 +194,7 @@ export const addComment = async (req, res) => {
       content
     });
     console.log(comment);
-    await post.increment('commentsCount');
+    await post.increment('commentCount');
 
     const commentWithUser = await PostInteraction.findByPk(comment.id, {
       include: [{
@@ -267,7 +265,7 @@ export const sharePost = async (req, res) => {
     const userId = req.user.id;
 
     const post = await Post.findByPk(postId);
-    if (!post || !post.isActive) {
+    if (!post) {
       return res.status(404).json({
         success: false,
         message: 'Post not found'
