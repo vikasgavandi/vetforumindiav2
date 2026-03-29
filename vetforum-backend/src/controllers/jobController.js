@@ -12,10 +12,10 @@ export const getJobVacancies = async (req, res) => {
     
     // Add filters
     if (location) {
-      whereClause.location = { [Op.iLike]: `%${location}%` };
+      whereClause.location = { [Op.like]: `%${location}%` };
     }
     if (organization) {
-      whereClause.organization = { [Op.iLike]: `%${organization}%` };
+      whereClause.organization = { [Op.like]: `%${organization}%` };
     }
 
     const { count, rows } = await JobVacancy.findAndCountAll({

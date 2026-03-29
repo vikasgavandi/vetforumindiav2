@@ -11,7 +11,7 @@ export const createPost = async (req, res) => {
     const post = await Post.create({
       userId,
       content,
-      photos
+      photo: photos && photos.length > 0 ? photos[0] : null
     });
 
     const postWithAuthor = await Post.findByPk(post.id, {
@@ -282,7 +282,7 @@ export const sharePost = async (req, res) => {
         postId,
         type: 'share'
       });
-      await post.increment('sharesCount');
+      // Note: sharesCount is not in Post model, skipping increment
     }
 
     res.json({

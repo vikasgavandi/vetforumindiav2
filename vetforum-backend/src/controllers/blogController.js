@@ -34,11 +34,11 @@ export const createBlog = async (req, res) => {
       title,
       subtitle,
       content,
-      excerpt,
-      featuredImage: savedFilename,
-      images: images ? JSON.parse(images) : [], // Handle stringified JSON from FormData
-      tags: tags ? (Array.isArray(tags) ? tags : JSON.parse(tags)) : [], // Handle tags from FormData
-      status: status || 'draft',
+      description: excerpt, // Map excerpt to description in model
+      photo: savedFilename,  // Map featuredImage to photo in model
+      tags: tags ? (Array.isArray(tags) ? tags : JSON.parse(tags)) : [],
+      category: req.body.category || 'General',
+      isPublished: status === 'published',
       authorId
     });
 
@@ -80,13 +80,11 @@ export const getBlogs = async (req, res) => {
 
     const whereClause = {};
 
-    // Non-authors can only see published blogs
+    // Filter by isPublished defaults to true for public users
     if (!req.user?.isAdmin && authorId !== userId?.toString()) {
-      whereClause.status = 'published';
-    }
-
-    if (status && (req.user?.isAdmin || authorId === userId?.toString())) {
-      whereClause.status = status;
+      whereClause.isPublished = true;
+    } else if (status) {
+      whereClause.isPublished = (status === 'published');
     }
 
     if (authorId) {
@@ -95,15 +93,14 @@ export const getBlogs = async (req, res) => {
 
     if (tags) {
       whereClause.tags = {
-        [Op.contains]: tags.split(',')
+        [Op.like]: `%${tags}%`
       };
     }
 
     if (search) {
       whereClause[Op.or] = [
-        { title: { [Op.iLike]: `%${search}%` } },
-        { subtitle: { [Op.iLike]: `%${search}%` } },
-        { content: { [Op.iLike]: `%${search}%` } }
+        { title: { [Op.like]: `%${search}%` } },
+        { content: { [Op.like]: `%${search}%` } }
       ];
     }
 
@@ -168,8 +165,7 @@ export const getBlogById = async (req, res) => {
     }
 
     // Check if user can view this blog
-    if (blog.status !== 'published') {
-
+    if (!blog.isPublished) {
       // Author aur admin ko allow hai
       if (blog.authorId === userId || req.user?.isAdmin) {
         // allowed, kuch mat karo
@@ -177,7 +173,7 @@ export const getBlogById = async (req, res) => {
         return res.status(403).json({
           success: false,
           errorCode: 'BLOG_NOT_PUBLISHED',
-          message: 'This blog is not published yet. Status has not been updated.'
+          message: 'This blog is not published yet.'
         });
       }
     }
@@ -195,7 +191,7 @@ export const getBlogById = async (req, res) => {
           blogId: blog.id,
           type: 'view'
         });
-        await blog.increment('viewsCount');
+        await blog.increment('viewCount');
       }
     }
 
@@ -242,34 +238,29 @@ export const updateBlog = async (req, res) => {
     if (excerpt !== undefined) updateData.excerpt = excerpt;
     
     if (req.file) {
-      // Save new image from Multer
       const savedFilename = await saveUploadedFile(req.file, 'blogs');
       if (savedFilename) {
-        // Delete old image if it exists
-        if (blog.featuredImage) {
-          deleteImage(blog.featuredImage, 'blogs');
+        if (blog.photo) {
+          deleteImage(blog.photo, 'blogs');
         }
-        updateData.featuredImage = savedFilename;
+        updateData.photo = savedFilename;
       }
     } else if (featuredImage !== undefined) {
       if (featuredImage && featuredImage.startsWith('data:image/')) {
-        // Save new image from Base64
         const savedFilename = await saveBase64Image(featuredImage, 'blogs');
         if (savedFilename) {
-          // Delete old image if it exists
-          if (blog.featuredImage) {
-            deleteImage(blog.featuredImage, 'blogs');
+          if (blog.photo) {
+            deleteImage(blog.photo, 'blogs');
           }
-          updateData.featuredImage = savedFilename;
+          updateData.photo = savedFilename;
         }
       } else {
-        updateData.featuredImage = featuredImage;
+        updateData.photo = featuredImage;
       }
     }
     
-    if (images) updateData.images = typeof images === 'string' ? JSON.parse(images) : images;
     if (tags) updateData.tags = typeof tags === 'string' ? JSON.parse(tags) : tags;
-    if (status) updateData.status = status;
+    if (status) updateData.isPublished = status === 'published';
 
     await blog.update(updateData);
 
@@ -349,7 +340,7 @@ export const toggleLike = async (req, res) => {
     const userId = req.user.id;
 
     const blog = await Blog.findByPk(id);
-    if (!blog || blog.status !== 'published') {
+    if (!blog || !blog.isPublished) {
       return res.status(404).json({
         success: false,
         message: 'Blog not found'
@@ -362,7 +353,6 @@ export const toggleLike = async (req, res) => {
 
     if (existingLike) {
       await existingLike.destroy();
-      await blog.decrement('likesCount');
 
       res.json({
         success: true,
@@ -375,7 +365,6 @@ export const toggleLike = async (req, res) => {
         blogId: id,
         type: 'like'
       });
-      await blog.increment('likesCount');
 
       res.json({
         success: true,
@@ -407,7 +396,7 @@ export const addComment = async (req, res) => {
     }
 
     const blog = await Blog.findByPk(id);
-    if (!blog || blog.status !== 'published') {
+    if (!blog || !blog.isPublished) {
       return res.status(404).json({
         success: false,
         message: 'Blog not found'
@@ -420,8 +409,6 @@ export const addComment = async (req, res) => {
       type: 'comment',
       content
     });
-
-    await blog.increment('commentsCount');
 
     const commentWithUser = await BlogInteraction.findByPk(comment.id, {
       include: [{

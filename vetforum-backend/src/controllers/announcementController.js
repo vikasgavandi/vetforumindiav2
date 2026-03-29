@@ -78,8 +78,6 @@ export const createAnnouncement = async (req, res) => {
       description: content, // Map content to description
       eventDate: eventDate || null,
       link: link || null,
-      venue: venue || null,
-      organizer: organizer || null,
       photo: photo || null,
       isActive: true,
       priority: 0 // Default priority
@@ -124,8 +122,6 @@ export const updateAnnouncement = async (req, res) => {
     if (content) updateData.description = content;
     if (eventDate !== undefined) updateData.eventDate = eventDate;
     if (link !== undefined) updateData.link = link;
-    if (venue !== undefined) updateData.venue = venue;
-    if (organizer !== undefined) updateData.organizer = organizer;
     if (photo !== undefined) updateData.photo = photo;
     if (isActive !== undefined) updateData.isActive = isActive;
     if (priority !== undefined) updateData.priority = priority;
