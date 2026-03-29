@@ -3,8 +3,11 @@ import logger from '../middleware/logger.js';
 
 export const seedSampleBlogs = async () => {
   try {
-    const admin = await User.findOne({ where: { role: 'A' } });
-    if (!admin) return;
+    const admin = await User.findOne({ where: { isAdmin: true } });
+    if (!admin) {
+      logger.warn('No admin user found for blog seeding');
+      return;
+    }
 
     const sampleBlogs = [
       {

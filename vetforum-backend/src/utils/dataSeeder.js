@@ -45,7 +45,6 @@ export const seedAllData = async () => {
         organization: 'Green Pet Clinic',
         location: 'Bangalore, Karnataka',
         salary: '₹40,000 - ₹55,000 per month',
-        experience: '0-2 years',
         jobDescription: 'Fresh graduates are welcome. General practice and consultation role.',
         qualification: 'BVSc & AH, Registered with VCI',
         designation: 'Junior Veterinarian',
