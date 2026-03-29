@@ -7,14 +7,12 @@ export const seedAllData = async () => {
     const announcementDocs = [
       {
         title: 'New Animal Welfare Guidelines 2024',
-        content: 'The government has released updated guidelines for veterinary practices regarding animal welfare and handling.',
-        postedBy: 'System Admin',
+        description: 'The government has released updated guidelines for veterinary practices regarding animal welfare and handling.',
         isActive: true
       },
       {
         title: 'VetForum India Webinar Series',
-        content: 'Join our upcoming webinar on "Advanced Small Animal Surgery" this Sunday at 10 AM.',
-        postedBy: 'Moderator',
+        description: 'Join our upcoming webinar on "Advanced Small Animal Surgery" this Sunday at 10 AM.',
         isActive: true
       }
     ];
@@ -35,10 +33,11 @@ export const seedAllData = async () => {
         title: 'Senior Veterinary Surgeon',
         organization: 'City Animal Hospital',
         location: 'Mumbai, Maharashtra',
-        salaryRange: '₹80,000 - ₹1,20,000 per month',
+        salary: '₹80,000 - ₹1,20,000 per month',
         experience: '5+ years',
-        description: 'Looking for an experienced surgeon for specialized soft tissue and orthopedic surgeries.',
-        requirements: 'MVSc (Surgery), Registered with VCI',
+        jobDescription: 'Looking for an experienced surgeon for specialized soft tissue and orthopedic surgeries.',
+        qualification: 'MVSc (Surgery), Registered with VCI',
+        designation: 'Senior Surgeon',
         contactEmail: 'hr@cityvethospital.com',
         isActive: true
       },
@@ -46,10 +45,11 @@ export const seedAllData = async () => {
         title: 'Junior Veterinarian',
         organization: 'Green Pet Clinic',
         location: 'Bangalore, Karnataka',
-        salaryRange: '₹40,000 - ₹55,000 per month',
+        salary: '₹40,000 - ₹55,000 per month',
         experience: '0-2 years',
-        description: 'Fresh graduates are welcome. General practice and consultation role.',
-        requirements: 'BVSc & AH, Registered with VCI',
+        jobDescription: 'Fresh graduates are welcome. General practice and consultation role.',
+        qualification: 'BVSc & AH, Registered with VCI',
+        designation: 'Junior Veterinarian',
         contactEmail: 'clinic@greenpet.com',
         isActive: true
       }
