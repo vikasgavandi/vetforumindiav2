@@ -2,7 +2,7 @@ import { QuizCard, QuizAttempt, User, UserDocument, Expert, DoctorAvailability, 
 import { Op } from 'sequelize';
 import logger from '../middleware/logger.js';
 import bcrypt from 'bcryptjs';
-import { transporter, getApprovalEmailTemplate } from './authController.js';
+import { getTransporter, getApprovalEmailTemplate } from './authController.js';
 
 // --- Doctor (Expert) Management ---
 
@@ -85,7 +85,7 @@ export const createDoctor = async (req, res) => {
           };
           
           if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-            await transporter.sendMail(mailOptions);
+            await getTransporter().sendMail(mailOptions);
             logger.info(`Approval email sent to ${user.email} (Admin Created)`);
           } else {
             logger.warn(`Email credentials missing, skipping real approval email for ${user.email}`);
@@ -772,7 +772,7 @@ export const approveUser = async (req, res) => {
       };
       
       if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        await transporter.sendMail(mailOptions);
+        await getTransporter().sendMail(mailOptions);
         logger.info(`Approval email sent to ${user.email}`);
       } else {
         logger.warn(`Email credentials missing, skipping real approval email for ${user.email}`);
